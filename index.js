@@ -60,6 +60,17 @@ function InternetRelayChat(options) {
 		this.emit('invite', parseHostmask(line.prefix), line.tail);
 	});
 	
+	this.on('irc-join', function(line) {
+		var joiner = parseHostmask(line.prefix);
+		if(joiner.nick == self.myNick) {
+			self.channels[line.tail] = {"nicks": [self.myNick]};
+		} else {
+			self.channels[line.tail].nicks.push(joiner.nick);
+		}
+		
+		self.emit('join', joiner, line.tail);
+	});
+	
 	this.on('numeric4', function(line) {
 		if(!self.registered && (line.command == '432' || line.command == '433')) {
 			self.emit('badNickDuringRegistration', line.command);
@@ -144,6 +155,8 @@ InternetRelayChat.prototype._handleConnect = function() {
 	if(self.options.debug) {
 		console.log('== CONNECTED ==');
 	}
+	
+	this.channels = {};
 	
 	this.socket.setEncoding('utf8');
 	this.socket.on('data', function(data) {
