@@ -26,7 +26,7 @@ function InternetRelayChat(options) {
 	
 	defaultOptions.nick = defaultOptions.nick.replace(/ /g, '');
 	
-	this._options = defaultOptions;
+	this.options = defaultOptions;
 	this.registered = false;
 	
 	var self = this;
@@ -113,14 +113,14 @@ function InternetRelayChat(options) {
 
 InternetRelayChat.prototype.connect = function() {
 	var self = this;
-	if(this._options.ssl) {
+	if(this.options.ssl) {
 		this.secure = true;
-		this.socket = tls.connect({"socket": net.connect({"host": this._options.server, "port": this._options.port, "localAddress": this._options.localAddress}), "rejectUnauthorized": false}, function() {
+		this.socket = tls.connect({"socket": net.connect({"host": this.options.server, "port": this.options.port, "localAddress": this.options.localAddress}), "rejectUnauthorized": false}, function() {
 			self._handleConnect();
 		});
 	} else {
 		this.secure = false;
-		this.socket = net.connect({"host": this._options.server, "port": this._options.port, "localAddress": this._options.localAddress}, function() {
+		this.socket = net.connect({"host": this.options.server, "port": this.options.port, "localAddress": this.options.localAddress}, function() {
 			self._handleConnect();
 		});
 	}
@@ -128,7 +128,7 @@ InternetRelayChat.prototype.connect = function() {
 
 InternetRelayChat.prototype.quit = function(message) {
 	this.registered = false;
-	this._options.autoReconnect = 0;
+	this.options.autoReconnect = 0;
 	this.sendLine({"command": "QUIT", "tail": message});
 	this.socket.destroy();
 };
@@ -137,7 +137,7 @@ InternetRelayChat.prototype._handleConnect = function() {
 	var self = this;
 	this.emit('connect');
 	
-	if(self._options.debug) {
+	if(self.options.debug) {
 		console.log('== CONNECTED ==');
 	}
 	
@@ -162,35 +162,35 @@ InternetRelayChat.prototype._handleConnect = function() {
 	this.socket.on('close', function(error) {
 		self.emit('disconnect', error);
 		
-		if(self._options.debug) {
+		if(self.options.debug) {
 			console.log('== DISCONNECTED ==');
 		}
 		
-		if(self._options.autoReconnect > 0) {
+		if(self.options.autoReconnect > 0) {
 			setTimeout(function() {
 				self.connect();
-			}, self._options.autoReconnect);
+			}, self.options.autoReconnect);
 			
-			if(self._options.debug) {
-				console.log('Delaying ' + self._options.autoReconnect + 'ms and reconnecting');
+			if(self.options.debug) {
+				console.log('Delaying ' + self.options.autoReconnect + 'ms and reconnecting');
 			}
 		}
 	});
 	
-	if(this._options.password) {
-		this.sendLine({"command": "PASS", "args": [this._options.password]});
+	if(this.options.password) {
+		this.sendLine({"command": "PASS", "args": [this.options.password]});
 	}
 	
 	// TODO: http://nodejs.org/api/dns.html
-	this.nick(this._options.nick);
-	this.sendLine({"command": "USER", "args": [this._options.nick, this.socket.address().address, this.socket.address().address], "tail": this._options.realname});
+	this.nick(this.options.nick);
+	this.sendLine({"command": "USER", "args": [this.options.nick, this.socket.address().address, this.socket.address().address], "tail": this.options.realname});
 };
 
 InternetRelayChat.prototype.sendLine = function(line) {
 	// TODO: Flood control
 	var rawLine = makeLine(line, true);
 	this.socket.write(rawLine);
-	if(this._options.debug) {
+	if(this.options.debug) {
 		console.log("<< " + rawLine.substring(0, rawLine.length - 2));
 	}
 };
@@ -200,7 +200,7 @@ function makeLine(line, appendNewline) {
 }
 
 InternetRelayChat.prototype._processLine = function(rawLine) {
-	if(this._options.debug) {
+	if(this.options.debug) {
 		console.log(">> " + rawLine);
 	}
 	
