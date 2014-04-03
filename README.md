@@ -87,6 +87,14 @@ This property will be `true` if the current connection is using SSL.
 
 The bot's current nickname.
 
+## options
+
+An object representing the current connection's options, as defined in the constructor. The only properties that you should change are `autoReconnect` and `floodDelay`.
+
+## socket
+
+The connection's socket object. You can use `bot.socket.write()` to send a raw line to the IRC server.
+
 # Events
 
 ## connect
@@ -142,6 +150,40 @@ Emitted when the client receives any numeric reply of a specific class from the 
 
 Emitted when the client receives a `432` or `433` numeric reply while registering. If no listeners are bound to this event, `node-internet-relay-chat` will automatically retry a different nick (a `432` reply will change the nick to `nodejs`, a `433` reply will append a `_` to the nick).
 
+## invite
+- `inviter` - A `sender` object corresponding to the user that invited us
+- `channel` - The channel we were invited to
+
+Emitted when the client is invited to a channel.
+
+## join
+- `user` - A `sender` object corresponding to the user (possibly us) that joined the channel
+- `channel` - The channel that the user joined
+
+Emitted when a client joins a channel that we're in. Also emitted when we join a channel.
+
+## part
+- `user` - A `sender` object corresponding to the user (possibly us) that parted the channel
+- `channel` - The channel that the user parted
+- `message` - The part message, if any
+
+Emitted when a user parts from a channel. This will not be emitted when a user in a channel that we're in quits from the server, is killed, or is kicked. Also emitted when we part a channel.
+
+## kick
+- `kicker` - A `sender` object corresponding to the user that did the kicking
+- `user` - The nick of the user (possibly us) that was kicked from the channel
+- `channel` - The channel that the user was kicked from
+- `message` - The kick message, if any
+
+Emitted when a user is kicked from a channel. This will not be emitted when a user in a channel that we're in quits from the server, is killed, or parts gracefully. Also emitted when we're kicked from a channel.
+
+## quit
+- `user` - A `sender` object corresponding to the user (possibly us) that quit the server
+- `channels` - An array of channel names that we saw this user in
+- `message` - The quit message, if any
+
+Emitted when a user in one of the channels that we're in quits from the server. This will not be emitted when a user in a channel that we're in is killed, is kicked, or parts gracefully. This will not be emitted when we quit.
+
 ## pm
 - `sender` - A `sender` object corresponding to the user that sent the message (see `Sender Object` section below)
 - `message` - The message that was sent
@@ -179,25 +221,25 @@ Sends a raw line to the server (parameter is a line object). Only use this if yo
 
 Changes your nickname to `newNick`
 
-## ctcp(nick, line)
+## ctcp(nick, message)
 
-Sends a CTCP message to `nick`. `line` should be a line object.
+Sends a CTCP message to `nick`. `message` should be the CTCP message to be sent, followed by any arguments.
 
 An example of a `CTCP-PING` request:
 
 ```js
-bot.ctcp('McKay', {"command": "PING"});
+bot.ctcp('McKay', "PING");
 ```
 
-## ctcpReply(nick, line)
+## ctcpReply(nick, message)
 
-Sends a CTCP reply to `nick`. `line` should be a line object.
+Sends a CTCP reply to `nick`.
 
 An example reply to a `CTCP-VERSION` request:
 
 ```js
 bot.on('ctcp-version', function(line) {
-	bot.ctcpReply(line.sender.nick, {"command": "VERSION", "args": ["My Awesome IRC Bot v1.0.0"]});
+	bot.ctcpReply(line.sender.nick, "VERSION My Awesome IRC Bot v1.0.0");
 });
 ```
 
