@@ -94,6 +94,7 @@ function InternetRelayChat(options) {
 	this.on('irc-mode', function(line) {
 		var changer = parseHostmask(line.prefix);
 		self.emit('mode', changer, line.args[0], line.args[1], line.args.slice(2));
+		// TODO: Update user list if prefixes changed
 	});
 	
 	this.on('numeric4', function(line) {
@@ -322,6 +323,7 @@ InternetRelayChat.prototype._addToChannel = function(nick, channel) {
 		return;
 	}
 	
+	// TODO: Take prefixes into account
 	var index = this.channels[channel].nicks.indexOf(nick);
 	if(index != -1) {
 		return;
@@ -336,6 +338,7 @@ InternetRelayChat.prototype._removeFromChannel = function(nick, channel) {
 		return;
 	}
 	
+	// TODO: Take prefixes into account
 	var index = this.channels[channel].nicks.indexOf(nick);
 	if(index == -1) {
 		return;
