@@ -115,12 +115,12 @@ InternetRelayChat.prototype.connect = function() {
 	var self = this;
 	if(this._options.ssl) {
 		this.secure = true;
-		this._socket = tls.connect({"socket": net.connect({"host": this._options.server, "port": this._options.port, "localAddress": this._options.localAddress}), "rejectUnauthorized": false}, function() {
+		this.socket = tls.connect({"socket": net.connect({"host": this._options.server, "port": this._options.port, "localAddress": this._options.localAddress}), "rejectUnauthorized": false}, function() {
 			self._handleConnect();
 		});
 	} else {
 		this.secure = false;
-		this._socket = net.connect({"host": this._options.server, "port": this._options.port, "localAddress": this._options.localAddress}, function() {
+		this.socket = net.connect({"host": this._options.server, "port": this._options.port, "localAddress": this._options.localAddress}, function() {
 			self._handleConnect();
 		});
 	}
@@ -130,7 +130,7 @@ InternetRelayChat.prototype.quit = function(message) {
 	this.registered = false;
 	this._options.autoReconnect = 0;
 	this.sendLine({"command": "QUIT", "tail": message});
-	this._socket.destroy();
+	this.socket.destroy();
 };
 
 InternetRelayChat.prototype._handleConnect = function() {
@@ -141,8 +141,8 @@ InternetRelayChat.prototype._handleConnect = function() {
 		console.log('== CONNECTED ==');
 	}
 	
-	this._socket.setEncoding('utf8');
-	this._socket.on('data', function(data) {
+	this.socket.setEncoding('utf8');
+	this.socket.on('data', function(data) {
 		if(self._splitPacket) {
 			data = self._splitPacket + data;
 			self._splitPacket = null;
@@ -159,7 +159,7 @@ InternetRelayChat.prototype._handleConnect = function() {
 		}
 	});
 	
-	this._socket.on('close', function(error) {
+	this.socket.on('close', function(error) {
 		self.emit('disconnect', error);
 		
 		if(self._options.debug) {
@@ -183,13 +183,13 @@ InternetRelayChat.prototype._handleConnect = function() {
 	
 	// TODO: http://nodejs.org/api/dns.html
 	this.nick(this._options.nick);
-	this.sendLine({"command": "USER", "args": [this._options.nick, this._socket.address().address, this._socket.address().address], "tail": this._options.realname});
+	this.sendLine({"command": "USER", "args": [this._options.nick, this.socket.address().address, this.socket.address().address], "tail": this._options.realname});
 };
 
 InternetRelayChat.prototype.sendLine = function(line) {
 	// TODO: Flood control
 	var rawLine = makeLine(line, true);
-	this._socket.write(rawLine);
+	this.socket.write(rawLine);
 	if(this._options.debug) {
 		console.log("<< " + rawLine.substring(0, rawLine.length - 2));
 	}
