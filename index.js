@@ -181,6 +181,7 @@ InternetRelayChat.prototype._handleConnect = function() {
 		this.sendLine({"command": "PASS", "args": [this._options.password]});
 	}
 	
+	// TODO: http://nodejs.org/api/dns.html
 	this.nick(this._options.nick);
 	this.sendLine({"command": "USER", "args": [this._options.nick, this._socket.address().address, this._socket.address().address], "tail": this._options.realname});
 };
