@@ -91,6 +91,11 @@ function InternetRelayChat(options) {
 		self.emit('quit', quitter, channels, line.tail);
 	});
 	
+	this.on('irc-mode', function(line) {
+		var changer = parseHostmask(line.prefix);
+		self.emit('mode', changer, line.args[0], line.args[1], line.args.slice(2));
+	});
+	
 	this.on('numeric4', function(line) {
 		if(!self.registered && (line.command == '432' || line.command == '433')) {
 			self.emit('badNickDuringRegistration', line.command);
