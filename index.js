@@ -120,7 +120,7 @@ function InternetRelayChat(options) {
 			}
 			
 			var arg = line.args[i].split('=');
-			self.support[arg[0]] = arg[1];
+			self.support[arg[0].toLowerCase()] = arg[1];
 		}
 	});
 	
