@@ -92,6 +92,7 @@ Emitted when the client receives a line from the IRC server
 Emitted when the client receives a command from the IRC server. `<command>` will be the command received. For example, `irc-privmsg` will be emitted when a `PRIVMSG` is received. You don't usually want to listen for these types of events since most important ones have their own events.
 
 There is one important case to note:
+
 - `irc-ping` will be automatically caught and an appropriate `PONG` response will be sent by `node-internet-relay-chat`, but this will be suppressed if you bind any listeners to this event. If you bind a listener to `irc-ping`, make sure that you send the appropriate `PONG` response using `bot.sendLine`.
 
 ## ctcp-<command>
@@ -100,6 +101,7 @@ There is one important case to note:
 Emitted when the client receives a CTCP command from the IRC server. `<command>` will be the command received. For example, `ctcp-version` will be emitted when a `CTCP-VERSION` is received.
 
 There are three important cases to note:
+
 - `ctcp-ping` will be automatically caught and an appropriate response will be sent to the sender. If you bind a listener to this event, the automatic response will be suppressed. Make sure that you send a response if you desire.
 - `ctcp-time` will be automatically caught and an appropriate response will be sent to the sender. If you bind a listener to this event, the automatic response will be suppressed. MAke sure that you send a response if you desire.
 - Many IRC servers require clients to respond to `ctcp-version` requests. You may want to listen for this event and send an appropriate response (using `bot.ctcpReply`).
