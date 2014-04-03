@@ -188,6 +188,19 @@ Emitted when a user is kicked from a channel. This will not be emitted when a us
 
 Emitted when a user in one of the channels that we're in quits from the server. This will not be emitted when a user in a channel that we're in is killed, is kicked, or parts gracefully. This will not be emitted when we quit.
 
+## mode
+- `changer` - A `sender` object corresponding to the user that changed the mode
+- `channel` - The channel (or user, if a user mode) that had its mode changed
+- `mode` - The mode(s) that changed
+- `args` - Any applicable arguments
+
+Emitted when a user or channel mode is changed. Note that `args` may be an empty array (if no args are applicable) and that `mode` may contain multiple modes.
+
+Examples:
+
+- Multiple users 'foo' and 'bar' voiced: `mode = "+vv"`, `args = ["foo", "bar"]`
+- User 'foo' voiced and user 'bar' deopped: `mode = "+v-o"`, `args = ["foo", "bar"]`
+
 ## pm
 - `sender` - A `sender` object corresponding to the user that sent the message (see `Sender Object` section below)
 - `message` - The message that was sent
