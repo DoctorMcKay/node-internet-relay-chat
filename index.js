@@ -108,6 +108,17 @@ function InternetRelayChat(options) {
 		self.emit('registered');
 	});
 	
+	this.on('irc-005', function(line) {
+		for(var i = 0; i < line.args.length; i++) {
+			if(line.args[i] == self.myNick) {
+				continue;
+			}
+			
+			var arg = line.args[i].split('=');
+			self.support[arg[0]] = arg[1];
+		}
+	});
+	
 	this.on('irc-376', function(line) {
 		if(self.registered) {
 			return;
@@ -177,6 +188,7 @@ InternetRelayChat.prototype._handleConnect = function() {
 	}
 	
 	this.channels = {};
+	this.support = {};
 	
 	this.socket.setEncoding('utf8');
 	this.socket.on('data', function(data) {
