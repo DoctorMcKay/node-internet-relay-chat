@@ -52,43 +52,41 @@ var defaultOptions = {
 };
 ```
 
-# Bot
+# Properties
 
-## Properties
-
-### registered
+## registered
 
 This property will be `true` if the client is currently connected to and registered with an IRC server.
 
-### secure
+## secure
 
 This property will be `true` if the current connection is using SSL.
 
-### myNick
+## myNick
 
 The bot's current nickname.
 
-## Events
+# Events
 
-### connect
+## connect
 
 Emitted when a successful connection has been established to the server, but the IRC registration still needs to be negotiated.
 
-### registered
+## registered
 
 Emitted when the client has been successfully registered with the IRC server.
 
-### disconnect
+## disconnect
 - `error` - This parameter will be `true` if the disconnect was due to a connection error
 
 Emitted when the client disconnects from the IRC server for any reason.
 
-### rawline
+## rawline
 - `line` - A `line` object (see `Line Object` section below)
 
 Emitted when the client receives a line from the IRC server
 
-### irc-<command>
+## irc-<command>
 - `line` - A `line` object (see `Line Object` section below)
 
 Emitted when the client receives a command from the IRC server. `<command>` will be the command received. For example, `irc-privmsg` will be emitted when a `PRIVMSG` is received. You don't usually want to listen for these types of events since most important ones have their own events.
@@ -96,7 +94,7 @@ Emitted when the client receives a command from the IRC server. `<command>` will
 There is one important case to note:
 - `irc-ping` will be automatically caught and an appropriate `PONG` response will be sent by `node-internet-relay-chat`, but this will be suppressed if you bind any listeners to this event. If you bind a listener to `irc-ping`, make sure that you send the appropriate `PONG` response using `bot.sendLine`.
 
-### ctcp-<command>
+## ctcp-<command>
 - `line` - A `line` object (see `Line Object` section below), with an additional `sender` property which is a `Sender Object`
 
 Emitted when the client receives a CTCP command from the IRC server. `<command>` will be the command received. For example, `ctcp-version` will be emitted when a `CTCP-VERSION` is received.
@@ -106,59 +104,59 @@ There are three important cases to note:
 - `ctcp-time` will be automatically caught and an appropriate response will be sent to the sender. If you bind a listener to this event, the automatic response will be suppressed. MAke sure that you send a response if you desire.
 - Many IRC servers require clients to respond to `ctcp-version` requests. You may want to listen for this event and send an appropriate response (using `bot.ctcpReply`).
 
-### numeric
+## numeric
 - `line` - A `line` object (see `Line Object` section below)
 
 Emitted when the client receives any numeric reply from the IRC server. See [RFC 1459](http://tools.ietf.org/html/rfc1459.html#section-6) for an enumeration. Most clients display numeric replies to the client in a similar format as a `NOTICE`.
 
-### numeric<class>
+## numeric<class>
 - `line` - A `line` object (see `Line Object` section below)
 
 Emitted when the client receives any numeric reply of a specific class from the IRC server. For example, a `433` reply will emit `numeric4`.
 
-### badNickDuringRegistration
+## badNickDuringRegistration
 - `code` - One of `432` (indicating that the supplied nick contains invalid characters) or `433` (indicating that the supplied nick is already taken on the network)
 
 Emitted when the client receives a `432` or `433` numeric reply while registering. If no listeners are bound to this event, `node-internet-relay-chat` will automatically retry a different nick (a `432` reply will change the nick to `nodejs`, a `433` reply will append a `_` to the nick).
 
-### pm
+## pm
 - `sender` - A `sender` object corresponding to the user that sent the message (see `Sender Object` section below)
 - `message` - The message that was sent
 
 Emitted when a private message is received (one that is sent directly to the bot, not to a channel).
 
-### notice
+## notice
 - `Sender` - A `sender` object corresponding to the user that sent the message (see `Sender Object` section below)
 - `message` - The message that was sent
 
 Emitted when a notice is received (one that is sent directly to the bot, not to a channel).
 
-### message
+## message
 - `sender` - A `sender` object corresponding to the user that sent the message (see `Sender Object` section below)
 - `channel` - The channel to which the message was sent
 - `message` - The message that was sent
 
 Emitted when a message is sent to a channel that the bot is in.
 
-## Methods
+# Methods
 
-### connect()
+## connect()
 
 Connects to the IRC server using the options passed in the constructor.
 
-### quit([message])
+## quit([message])
 
 Quits (disconnects from) the IRC server with an optional message.
 
-### sendLine(line)
+## sendLine(line)
 
 Sends a raw line to the server (parameter is a line object). Only use this if you know what you're doing.
 
-### nick(newNick)
+## nick(newNick)
 
 Changes your nickname to `newNick`
 
-### ctcp(nick, line)
+## ctcp(nick, line)
 
 Sends a CTCP message to `nick`. `line` should be a line object.
 
@@ -168,7 +166,7 @@ An example of a `CTCP-PING` request:
 bot.ctcp('McKay', {"command": "PING"});
 ```
 
-### ctcpReply(nick, line)
+## ctcpReply(nick, line)
 
 Sends a CTCP reply to `nick`. `line` should be a line object.
 
@@ -180,19 +178,19 @@ bot.on('ctcp-version', function(line) {
 });
 ```
 
-### message(recipient, message)
+## message(recipient, message)
 
 Sends a message to a recipient. `recipient` should be either a nick (for a private message) or a channel (for a channel message) starting with the appropriate channel prefix.
 
-### notice(recipient, message)
+## notice(recipient, message)
 
 Sends a notice to a recipient. `recipient` should be either a nick (for a private message) or a channel (for a channel notice) starting with the appropriate channel prefix.
 
-### join(channel, [key])
+## join(channel, [key])
 
 Joins a `channel`, optionally using the specified `key`.
 
-### part(channel)
+## part(channel)
 
 Leaves a `channel`
 
