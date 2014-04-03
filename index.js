@@ -57,7 +57,7 @@ function InternetRelayChat(options) {
 	});
 	
 	this.on('irc-invite', function(line) {
-		this.emit('invite', parseHostmask(line.prefix), line.tail);
+		self.emit('invite', parseHostmask(line.prefix), line.tail);
 	});
 	
 	this.on('irc-join', function(line) {
