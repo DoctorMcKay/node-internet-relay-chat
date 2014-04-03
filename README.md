@@ -87,6 +87,10 @@ This property will be `true` if the current connection is using SSL.
 
 The bot's current nickname.
 
+## support
+
+An object containing all features that the IRC server supports (as reported by the 005 message).
+
 ## options
 
 An object representing the current connection's options, as defined in the constructor. The only properties that you should change are `autoReconnect` and `floodDelay`.
