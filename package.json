@@ -1,0 +1,15 @@
+{
+	"name": "internet-relay-chat",
+	"version": "0.1.0",
+	"description": "Provides tools to connect to and interact with IRC servers",
+	"keywords": ["irc", "chat", "internet relay chat"],
+	"homepage": "https://bitbucket.org/Doctor_McKay/node-internet-relay-chat",
+	"bugs": {
+		"url": "https://bitbucket.org/Doctor_McKay/node-internet-relay-chat/issues"
+	},
+	"license": "MIT",
+	"repository": {
+		"type": "hg",
+		"url": "https://bitbucket.org/Doctor_McKay/node-internet-relay-chat"
+	}
+}
