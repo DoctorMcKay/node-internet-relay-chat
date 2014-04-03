@@ -99,7 +99,7 @@ function InternetRelayChat(options) {
 			return;
 		}
 		
-		self.ctcpReply(line.sender.nick, {"command": "PING", "args": line.args, tail: line.tail});
+		self.ctcpReply(line.sender.nick, "PING" + ((line.args && line.args.length > 0) ? ' ' + line.args.join(' ') : ''));
 	});
 	
 	this.on('ctcp-time', function(line) {
@@ -107,7 +107,7 @@ function InternetRelayChat(options) {
 			return;
 		}
 		
-		self.ctcpReply(line.sender.nick, {"command": "TIME", "args": [new Date().toString()]});
+		self.ctcpReply(line.sender.nick, "TIME " + new Date().toString());
 	});
 }
 
@@ -267,12 +267,12 @@ InternetRelayChat.prototype.nick = function(newNick) {
 	this.sendLine({"command": "NICK", "args": [newNick]});
 };
 
-InternetRelayChat.prototype.ctcp = function(nick, line) {
-	this.message(nick, '\u0001' + makeLine(line, false) + '\u0001');
+InternetRelayChat.prototype.ctcp = function(nick, message) {
+	this.message(nick, '\u0001' + message + '\u0001');
 };
 
-InternetRelayChat.prototype.ctcpReply = function(nick, line) {
-	this.notice(nick, '\u0001' + makeLine(line, false) + '\u0001');
+InternetRelayChat.prototype.ctcpReply = function(nick, message) {
+	this.notice(nick, '\u0001' + message + '\u0001');
 };
 
 InternetRelayChat.prototype.message = function(recipient, message) {
