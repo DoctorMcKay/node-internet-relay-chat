@@ -62,12 +62,7 @@ function InternetRelayChat(options) {
 	
 	this.on('irc-join', function(line) {
 		var joiner = parseHostmask(line.prefix);
-		if(joiner.nick == self.myNick) {
-			self.channels[line.tail] = {"nicks": [self.myNick]};
-		} else {
-			self.channels[line.tail].nicks.push(joiner.nick);
-		}
-		
+		self._addToChannel(joiner.nick, line.tail);
 		self.emit('join', joiner, line.tail);
 	});
 	
@@ -277,6 +272,35 @@ function parseHostmask(hostmask) {
 	user.hostname = hostmask.substring(hostmask.indexOf('@') + 1);
 	return user;
 }
+
+InternetRelayChat.prototype._addToChannel = function(nick, channel) {
+	var self = this;
+	if(nick == this.myNick) {
+		this.channels[channel] = {"nicks": [self.myNick]};
+		return;
+	}
+	
+	var index = this.channels[channel].nicks.indexOf(nick);
+	if(index != -1) {
+		return;
+	}
+	
+	this.channels[channel].nicks.push(nick);
+};
+
+InternetRelayChat.prototype._removeFromChannel = function(nick, channel) {
+	if(nick == this.myNick) {
+		delete this.channels[channel];
+		return;
+	}
+	
+	var index = this.channels[channel].nicks.indexOf(nick);
+	if(index == -1) {
+		return;
+	}
+	
+	this.channels[channel].nicks.splice(index, 1);
+};
 
 InternetRelayChat.prototype.nick = function(newNick) {
 	this._oldNick = this.myNick;
