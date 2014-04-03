@@ -56,6 +56,10 @@ function InternetRelayChat(options) {
 		}
 	});
 	
+	this.on('irc-invite', function(line) {
+		this.emit('invite', parseHostmask(line.prefix), line.tail);
+	});
+	
 	this.on('numeric4', function(line) {
 		if(!self.registered && (line.command == '432' || line.command == '433')) {
 			self.emit('badNickDuringRegistration', line.command);
