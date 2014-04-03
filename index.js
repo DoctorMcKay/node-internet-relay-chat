@@ -78,6 +78,19 @@ function InternetRelayChat(options) {
 		self.emit('kick', kicker, line.args[1], line.args[0], line.tail);
 	});
 	
+	this.on('irc-quit', function(line) {
+		var quitter = parseHostmask(line.prefix);
+		var channels = [];
+		for(var channel in self.channels) {
+			if(self.channels[channel].nicks.indexOf(quitter.nick) != -1) {
+				channels.push(channel);
+				self._removeFromChannel(quitter.nick, channel);
+			}
+		}
+		
+		self.emit('quit', quitter, channels, line.tail);
+	});
+	
 	this.on('numeric4', function(line) {
 		if(!self.registered && (line.command == '432' || line.command == '433')) {
 			self.emit('badNickDuringRegistration', line.command);
