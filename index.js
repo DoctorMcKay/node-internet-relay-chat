@@ -125,6 +125,24 @@ function InternetRelayChat(options) {
 		}
 	});
 	
+	this.on('irc-353', function(line) {
+		// NAMES list
+		var channel = line.args[line.args.length - 1];
+		if(!self.channels[channel].updatingNames) {
+			self.channels[channel].updatingNames = true;
+			self.channels[channel].nicks = line.tail.split(' ');
+		} else {
+			self.channels[channel].nicks.concat(line.tail.split(' '));
+		}
+	});
+	
+	this.on('irc-366', function(line) {
+		// End of /NAMES list
+		var channel = line.args[line.args.length - 1];
+		self.channels[channel].updatingNames = false;
+		self.emit('names', channel);
+	});
+	
 	this.on('irc-376', function(line) {
 		if(self.registered) {
 			return;
@@ -384,3 +402,6 @@ InternetRelayChat.prototype.part = function(channel) {
 	this.sendLine({"command": "PART", "args": [channel]});
 };
 
+InternetRelayChat.prototype.updateChannelNames = function(channel) {
+	this.sendLine({"command": "NAMES", "args": [channel]});
+};
