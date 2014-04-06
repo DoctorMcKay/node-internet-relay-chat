@@ -93,8 +93,22 @@ function InternetRelayChat(options) {
 	
 	this.on('irc-mode', function(line) {
 		var changer = parseHostmask(line.prefix);
+		if(!line.args[1] && line.tail) {
+			line.args[1] = line.tail;
+		}
+		
 		self.emit('mode', changer, line.args[0], line.args[1], line.args.slice(2));
-		// TODO: Update user list if prefixes changed
+		
+		if(line.args.length > 2) {
+			var prefixModes = self.support.prefix.match(/\([a-zA-Z]+\)/)[0];
+			for(var i = 1; i < prefixModes.length - 1; i++) {
+				if(line.args[1].indexOf(prefixModes.charAt(i))) {
+					// Prefixes changed!
+					self.updateChannelNames(line.args[0]);
+					break;
+				}
+			}
+		}
 	});
 	
 	this.on('numeric4', function(line) {
