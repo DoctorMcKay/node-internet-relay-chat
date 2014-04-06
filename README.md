@@ -97,7 +97,7 @@ An object representing the current connection's options, as defined in the const
 
 ## socket
 
-The connection's socket object. You can use `bot.socket.write()` to send a raw line to the IRC server.
+The connection's socket object. You can use this if you need to do something that isn't exposed in other methods or properties.
 
 # Events
 
@@ -201,6 +201,11 @@ Examples:
 - Multiple users 'foo' and 'bar' voiced: `mode = "+vv"`, `args = ["foo", "bar"]`
 - User 'foo' voiced and user 'bar' deopped: `mode = "+v-o"`, `args = ["foo", "bar"]`
 
+## names
+- `channel` - Channel for which we just got updated names
+
+Emitted when the full list of nicknames in a `channel` is received. The array (with nick prefixes) can be accessed via `bot.channels[channel].nicks`.
+
 ## pm
 - `sender` - A `sender` object corresponding to the user that sent the message (see `Sender Object` section below)
 - `message` - The message that was sent
@@ -233,6 +238,10 @@ Quits (disconnects from) the IRC server with an optional message.
 ## sendLine(line)
 
 Sends a raw line to the server (parameter is a line object). Only use this if you know what you're doing.
+
+## sendRawLine(line)
+
+Sends a raw line string to the server. This will be appended with `\r\n` automatically. Only use this if you know what you're doing.
 
 ## nick(newNick)
 
@@ -275,6 +284,10 @@ Joins a `channel`, optionally using the specified `key`.
 ## part(channel)
 
 Leaves a `channel`
+
+## updateChannelNames(channel)
+
+Sends a request to the IRC server for the full list of nicks in `channel`. The `names` event will be emitted when the response is received.
 
 # Line Object
 
