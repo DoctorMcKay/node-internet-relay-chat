@@ -250,6 +250,13 @@ InternetRelayChat.prototype.sendLine = function(line) {
 	}
 };
 
+InternetRelayChat.prototype.sendRawLine = function(line) {
+	this.socket.write(line + "\r\n");
+	if(this.options.debug) {
+		console.log("<< " + line);
+	}
+};
+
 function makeLine(line, appendNewline) {
 	return line.command.toUpperCase() + ((line.args && line.args.length > 0) ? ' ' + line.args.join(' ').trim() : '') + ((line.tail) ? ' :' + line.tail : '') + ((appendNewline) ? "\r\n" : '');
 }
