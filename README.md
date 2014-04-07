@@ -235,21 +235,21 @@ Connects to the IRC server using the options passed in the constructor.
 
 Quits (disconnects from) the IRC server with an optional message.
 
-## sendLine(line)
+## sendLine(line, callback)
 
 Sends a raw line to the server (parameter is a line object). Only use this if you know what you're doing.
 
 ## sendRawLine(line)
 
-Sends a raw line string to the server. This will be appended with `\r\n` automatically. Only use this if you know what you're doing.
+Sends a raw line string to the server. This will be appended with `\r\n` automatically. This will bypass flood control. Only use this if you know what you're doing.
 
-## nick(newNick)
+## nick(newNick, [callback])
 
-Changes your nickname to `newNick`
+Changes your nickname to `newNick`. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
 
-## ctcp(nick, message)
+## ctcp(nick, message, [callback])
 
-Sends a CTCP message to `nick`. `message` should be the CTCP message to be sent, followed by any arguments.
+Sends a CTCP message to `nick`. `message` should be the CTCP message to be sent, followed by any arguments. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
 
 An example of a `CTCP-PING` request:
 
@@ -257,9 +257,9 @@ An example of a `CTCP-PING` request:
 bot.ctcp('McKay', "PING");
 ```
 
-## ctcpReply(nick, message)
+## ctcpReply(nick, message, [callback])
 
-Sends a CTCP reply to `nick`.
+Sends a CTCP reply to `nick`. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
 
 An example reply to a `CTCP-VERSION` request:
 
@@ -269,21 +269,21 @@ bot.on('ctcp-version', function(line) {
 });
 ```
 
-## message(recipient, message)
+## message(recipient, message, [callback])
 
-Sends a message to a recipient. `recipient` should be either a nick (for a private message) or a channel (for a channel message) starting with the appropriate channel prefix.
+Sends a message to a recipient. `recipient` should be either a nick (for a private message) or a channel (for a channel message) starting with the appropriate channel prefix. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
 
-## notice(recipient, message)
+## notice(recipient, message, [callback])
 
-Sends a notice to a recipient. `recipient` should be either a nick (for a private message) or a channel (for a channel notice) starting with the appropriate channel prefix.
+Sends a notice to a recipient. `recipient` should be either a nick (for a private message) or a channel (for a channel notice) starting with the appropriate channel prefix. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
 
-## join(channel, [key])
+## join(channel, [key], [callback])
 
-Joins a `channel`, optionally using the specified `key`.
+Joins a `channel`, optionally using the specified `key`. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
 
-## part(channel)
+## part(channel, [callback])
 
-Leaves a `channel`
+Leaves a `channel`. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
 
 ## updateChannelNames(channel)
 

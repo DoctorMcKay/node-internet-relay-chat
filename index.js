@@ -213,8 +213,10 @@ InternetRelayChat.prototype.connect = function() {
 InternetRelayChat.prototype.quit = function(message) {
 	this.registered = false;
 	this.options.autoReconnect = 0;
-	this.sendLine({"command": "QUIT", "tail": message});
-	this.socket.destroy();
+	var self = this;
+	this.sendLine({"command": "QUIT", "tail": message}, function() {
+		self.socket.destroy();
+	});
 };
 
 InternetRelayChat.prototype._handleConnect = function() {
@@ -227,6 +229,7 @@ InternetRelayChat.prototype._handleConnect = function() {
 	
 	this.channels = {};
 	this.support = {};
+	this._nextFloodSend = 0;
 	
 	this.socket.setEncoding('utf8');
 	this.socket.on('data', function(data) {
@@ -273,13 +276,22 @@ InternetRelayChat.prototype._handleConnect = function() {
 	this.sendLine({"command": "USER", "args": [this.options.nick, this.socket.address().address, this.socket.address().address], "tail": this.options.realname});
 };
 
-InternetRelayChat.prototype.sendLine = function(line) {
-	// TODO: Flood control
-	var rawLine = makeLine(line, true);
-	this.socket.write(rawLine);
-	if(this.options.debug) {
-		console.log("<< " + rawLine.substring(0, rawLine.length - 2));
+InternetRelayChat.prototype.sendLine = function(line, callback) {
+	var delay = this._nextFloodSend - Date.now();
+	if(delay < 0) {
+		delay = 0;
+		this._nextFloodSend = Date.now();
 	}
+	
+	this._nextFloodSend = this._nextFloodSend + this.options.floodDelay;
+	
+	var self = this;
+	setTimeout(function() {
+		self.sendRawLine(makeLine(line));
+		if(callback) {
+			callback();
+		}
+	}, delay);
 };
 
 InternetRelayChat.prototype.sendRawLine = function(line) {
@@ -289,8 +301,8 @@ InternetRelayChat.prototype.sendRawLine = function(line) {
 	}
 };
 
-function makeLine(line, appendNewline) {
-	return line.command.toUpperCase() + ((line.args && line.args.length > 0) ? ' ' + line.args.join(' ').trim() : '') + ((line.tail) ? ' :' + line.tail : '') + ((appendNewline) ? "\r\n" : '');
+function makeLine(line) {
+	return line.command.toUpperCase() + ((line.args && line.args.length > 0) ? ' ' + line.args.join(' ').trim() : '') + ((line.tail) ? ' :' + line.tail : '');
 }
 
 InternetRelayChat.prototype._processLine = function(rawLine) {
@@ -386,34 +398,34 @@ InternetRelayChat.prototype._removeFromChannel = function(nick, channel) {
 	this.channels[channel].nicks.splice(index, 1);
 };
 
-InternetRelayChat.prototype.nick = function(newNick) {
+InternetRelayChat.prototype.nick = function(newNick, callback) {
 	this._oldNick = this.myNick;
 	this.myNick = newNick;
-	this.sendLine({"command": "NICK", "args": [newNick]});
+	this.sendLine({"command": "NICK", "args": [newNick]}, callback);
 };
 
-InternetRelayChat.prototype.ctcp = function(nick, message) {
-	this.message(nick, '\u0001' + message + '\u0001');
+InternetRelayChat.prototype.ctcp = function(nick, message, callback) {
+	this.message(nick, '\u0001' + message + '\u0001', callback);
 };
 
-InternetRelayChat.prototype.ctcpReply = function(nick, message) {
-	this.notice(nick, '\u0001' + message + '\u0001');
+InternetRelayChat.prototype.ctcpReply = function(nick, message, callback) {
+	this.notice(nick, '\u0001' + message + '\u0001', callback);
 };
 
-InternetRelayChat.prototype.message = function(recipient, message) {
-	this.sendLine({"command": "PRIVMSG", "args": [recipient], tail: message});
+InternetRelayChat.prototype.message = function(recipient, message, callback) {
+	this.sendLine({"command": "PRIVMSG", "args": [recipient], tail: message}, callback);
 };
 
-InternetRelayChat.prototype.notice = function(recipient, message) {
-	this.sendLine({"command": "NOTICE", "args": [recipient], tail: message});
+InternetRelayChat.prototype.notice = function(recipient, message, callback) {
+	this.sendLine({"command": "NOTICE", "args": [recipient], tail: message}, callback);
 };
 
-InternetRelayChat.prototype.join = function(channel, key) {
-	this.sendLine({"command": "JOIN", "args": [channel, key]});
+InternetRelayChat.prototype.join = function(channel, key, callback) {
+	this.sendLine({"command": "JOIN", "args": [channel, key]}, callback);
 };
 
-InternetRelayChat.prototype.part = function(channel) {
-	this.sendLine({"command": "PART", "args": [channel]});
+InternetRelayChat.prototype.part = function(channel, callback) {
+	this.sendLine({"command": "PART", "args": [channel]}, callback);
 };
 
 InternetRelayChat.prototype.updateChannelNames = function(channel) {
