@@ -15,7 +15,7 @@ function InternetRelayChat(options) {
 		"port": 6667,
 		"password": false,
 		"autoReconnect": 15000,
-		"ssl": false,
+		"secure": false,
 		"localAddress": null,
 		"vhost": null,
 		"floodDelay": 1000,
@@ -200,7 +200,7 @@ function InternetRelayChat(options) {
 InternetRelayChat.prototype.connect = function() {
 	var self = this;
 	var sockOptions = {"host": this.options.server, "port": this.options.port, "localAddress": this.options.localAddress};
-	if(this.options.ssl) {
+	if(this.options.secure) {
 		this.secure = true;
 		this.socket = tls.connect({"socket": net.connect(sockOptions), "rejectUnauthorized": false}, function() {
 			self._handleConnect();
