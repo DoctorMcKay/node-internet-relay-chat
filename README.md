@@ -217,6 +217,23 @@ Examples:
 
 Emitted when the full list of nicknames in a `channel` is received. The array (with nick prefixes) can be accessed via `bot.channels[channel].nicks`.
 
+## whois
+- `nick` - The nick of the user we received data for
+
+Emitted when numeric 318 (End of /WHOIS list) is received from the IRC server. The user's information may be accessed via bot.whoisData[nick]. It will contain the following properties, although some may be missing depending on what the server sends back:
+
+- `away` - False if the user is not away (or the server doesn't support 301) or a string containing the user's away message
+- `ircop` - False if the user is not an IRCOp, or true otherwise
+- `nick` - The user's nickname
+- `username` - The user's username
+- `hostname` - The user's address
+- `realname` - The user's real name
+- `server` - The address of the server they're on
+- `serverinfo` - Any information about the server that was sent
+- `idle` - Number of seconds the user has been idle (measured from last message sent)
+- `signon` - A timestamp representing when the user joined IRC
+- `channels` - An array of channel names. On most servers, the user's prefix will be prepended to the channel name (for example, if the user is an op on channel #foo, the entry will be @#foo)
+
 ## pm
 - `sender` - A `sender` object corresponding to the user that sent the message (see `Sender Object` section below)
 - `message` - The message that was sent
@@ -311,6 +328,10 @@ Leaves a `channel`. `callback` will be called, if provided, when the command has
 ## updateChannelNames(channel)
 
 Sends a request to the IRC server for the full list of nicks in `channel`. The `names` event will be emitted when the response is received.
+
+## whois(nick)
+
+Sends a request to the IRC server for a user's information. The `whois` event will be emitted when the full response is received.
 
 # Line Object
 
