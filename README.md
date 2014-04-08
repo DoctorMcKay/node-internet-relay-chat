@@ -106,6 +106,11 @@ The connection's socket object. You can use this if you need to do something tha
 
 # Events
 
+## error
+- `e` - Error object
+
+Same as [net.Socket](http://nodejs.org/api/net.html#net_event_error_1) error event.
+
 ## connect
 
 Emitted when a successful connection has been established to the server, but the IRC registration still needs to be negotiated.
