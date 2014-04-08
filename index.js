@@ -1,5 +1,6 @@
 var net = require('net');
 var tls = require('tls');
+var dns = require('dns');
 
 module.exports = InternetRelayChat;
 
@@ -16,6 +17,7 @@ function InternetRelayChat(options) {
 		"autoReconnect": 15000,
 		"ssl": false,
 		"localAddress": null,
+		"vhost": null,
 		"floodDelay": 1000,
 		"debug": false
 	};
@@ -197,17 +199,22 @@ function InternetRelayChat(options) {
 
 InternetRelayChat.prototype.connect = function() {
 	var self = this;
+	var sockOptions = {"host": this.options.server, "port": this.options.port, "localAddress": this.options.localAddress};
 	if(this.options.ssl) {
 		this.secure = true;
-		this.socket = tls.connect({"socket": net.connect({"host": this.options.server, "port": this.options.port, "localAddress": this.options.localAddress}), "rejectUnauthorized": false}, function() {
+		this.socket = tls.connect({"socket": net.connect(sockOptions), "rejectUnauthorized": false}, function() {
 			self._handleConnect();
 		});
 	} else {
 		this.secure = false;
-		this.socket = net.connect({"host": this.options.server, "port": this.options.port, "localAddress": this.options.localAddress}, function() {
+		this.socket = net.connect(sockOptions, function() {
 			self._handleConnect();
 		});
 	}
+	
+	this.socket.on('error', function(e) {
+		self.emit('error', e);
+	});
 };
 
 InternetRelayChat.prototype.quit = function(message) {
@@ -271,9 +278,20 @@ InternetRelayChat.prototype._handleConnect = function() {
 		this.sendLine({"command": "PASS", "args": [this.options.password]});
 	}
 	
-	// TODO: http://nodejs.org/api/dns.html
 	this.nick(this.options.nick);
-	this.sendLine({"command": "USER", "args": [this.options.nick, this.socket.address().address, this.socket.address().address], "tail": this.options.realname});
+	if(this.options.vhost) {
+		this.sendLine({"command": "USER", "args": [this.options.nick, this.options.vhost, this.socket.address().address], "tail": this.options.realname});
+	} else {
+		dns.reverse(this.socket.address().address, function(err, domains) {
+			// Silently ignore errors
+			var hostname = domains[0] || self.socket.address().address;
+			if(domains.indexOf(self.options.localAddress) != -1) {
+				hostname = self.options.localAddress;
+			}
+			
+			self.sendLine({"command": "USER", "args": [self.options.nick, hostname, self.socket.address().address], "tail": self.options.realname});
+		});
+	}
 };
 
 InternetRelayChat.prototype.sendLine = function(line, callback) {
