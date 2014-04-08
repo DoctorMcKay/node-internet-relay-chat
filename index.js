@@ -29,6 +29,7 @@ function InternetRelayChat(options) {
 	defaultOptions.nick = defaultOptions.nick.replace(/ /g, '');
 	
 	this.options = defaultOptions;
+	this.connected = false;
 	this.registered = false;
 	
 	var self = this;
@@ -223,6 +224,8 @@ InternetRelayChat.prototype.connect = function() {
 	}
 	
 	this.socket.on('error', function(e) {
+		self.connected = false;
+		self.registered = false;
 		self.emit('error', e);
 	});
 };
@@ -238,6 +241,7 @@ InternetRelayChat.prototype.quit = function(message) {
 
 InternetRelayChat.prototype._handleConnect = function() {
 	var self = this;
+	this.connected = true;
 	this.emit('connect');
 	
 	if(self.options.debug) {
@@ -267,6 +271,8 @@ InternetRelayChat.prototype._handleConnect = function() {
 	});
 	
 	this.socket.on('close', function(error) {
+		self.connected = false;
+		self.registered = false;
 		self.emit('disconnect', error);
 		
 		if(self.options.debug) {
