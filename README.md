@@ -224,10 +224,11 @@ Emitted when the full list of nicknames in a `channel` is received. The array (w
 Emitted when a private message is received (one that is sent directly to the bot, not to a channel).
 
 ## notice
-- `Sender` - A `sender` object corresponding to the user that sent the message (see `Sender Object` section below)
+- `sender` - A `sender` object corresponding to the user that sent the message (see `Sender Object` section below)
+- `recipient` - The recipient of the notice, either our nick or a channel
 - `message` - The message that was sent
 
-Emitted when a notice is received (one that is sent directly to the bot, not to a channel).
+Emitted when a notice is received, either directly to us or to a channel we're in.
 
 ## message
 - `sender` - A `sender` object corresponding to the user that sent the message (see `Sender Object` section below)
