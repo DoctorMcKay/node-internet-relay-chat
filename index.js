@@ -402,8 +402,7 @@ InternetRelayChat.prototype._addToChannel = function(nick, channel) {
 		return;
 	}
 	
-	// TODO: Take prefixes into account
-	var index = this.channels[channel].nicks.indexOf(nick);
+	var index = this._isInChannel(nick, channel);
 	if(index != -1) {
 		return;
 	}
@@ -417,13 +416,42 @@ InternetRelayChat.prototype._removeFromChannel = function(nick, channel) {
 		return;
 	}
 	
-	// TODO: Take prefixes into account
-	var index = this.channels[channel].nicks.indexOf(nick);
+	var index = this._isInChannel(nick, channel);
 	if(index == -1) {
 		return;
 	}
 	
 	this.channels[channel].nicks.splice(index, 1);
+};
+
+InternetRelayChat.prototype._nickHasPrefix = function(nick) {
+	var prefixes;
+	if(!this.support.prefix) {
+		prefixes = ['~', '&', '@', '%', '+'];
+	} else {
+		prefixes = this.support.prefix.substring(this.support.prefix.indexOf(')') + 1).split('');
+	}
+	
+	return prefixes.indexOf(nick.charAt(0)) != -1;
+};
+
+InternetRelayChat.prototype._isInChannel = function(nick, channel) {
+	if(this._nickHasPrefix(nick)) {
+		nick = nick.substring(1);
+	}
+	
+	for(var i = 0; i < this.channels[channel].nicks.length; i++) {
+		var buffer = this.channels[channel].nicks[i];
+		if(this._nickHasPrefix(buffer)) {
+			buffer = buffer.substring(1);
+		}
+		
+		if(nick == buffer) {
+			return i;
+		}
+	}
+	
+	return -1;
 };
 
 InternetRelayChat.prototype.nick = function(newNick, callback) {
