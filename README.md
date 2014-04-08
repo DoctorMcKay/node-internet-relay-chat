@@ -1,6 +1,6 @@
 # node-internet-relay-chat
 
-This is a Node.js module that's designed to provide as complete of an IRC interface as is possible. This module is still in development; as such, many events and methods are missing.
+This is a Node.js module that's designed to provide as complete of an IRC interface as is possible.
 
 # License
 
