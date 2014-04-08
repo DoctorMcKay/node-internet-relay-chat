@@ -124,6 +124,61 @@ function InternetRelayChat(options) {
 		}
 	});
 	
+	this.on('numeric3', function(line) {
+		var whoisNumerics = [301, 311, 312, 313, 317, 318, 319];
+		if(whoisNumerics.indexOf(line.command) != -1) {
+			// It's a WHOIS reply
+			if(line.args[0] == self.myNick) {
+				line.args.splice(0);
+			}
+			
+			var data;
+			if(self.whoisData[line.args[0]]._updating) {
+				data = {"_updating": false, "away": false, "ircop": false, "channels": []};
+			} else {
+				data = self.whoisData[line.args[0]];
+			}
+			
+			switch(line.command) {
+				case 301:
+					// Is away
+					data.away = line.tail;
+					break;
+				case 311:
+					// User info
+					data.nick = line.args[0];
+					data.username = line.args[1];
+					data.hostname = line.args[2];
+					data.realname = line.tail;
+					break;
+				case 312:
+					// Server they're on
+					data.server = line.args[1];
+					data.serverinfo = line.tail;
+					break;
+				case 313:
+					// IRC operator
+					data.ircop = true;
+					break;
+				case 317:
+					data.idle = line.args[1];
+					data.signon = line.args[2];
+					break;
+				case 318:
+					// End of WHOIS
+					self.whoisData[line.args[0]] = data;
+					self.emit('whois', line.args[0]);
+					break;
+				case 319:
+					// Channel list, may be repeated for large numbers of channels
+					data.channels.concat(line.tail.split(' '));
+					break;
+			}
+			
+			self.whoisData[line.args[0]] = data;
+		}
+	});
+	
 	this.on('numeric4', function(line) {
 		if(!self.registered && (line.command == '432' || line.command == '433')) {
 			self.emit('badNickDuringRegistration', line.command);
@@ -250,6 +305,7 @@ InternetRelayChat.prototype._handleConnect = function() {
 	
 	this.channels = {};
 	this.support = {};
+	this.whoisData = {};
 	this._nextFloodSend = 0;
 	
 	this.socket.setEncoding('utf8');
@@ -500,4 +556,13 @@ InternetRelayChat.prototype.part = function(channel, callback) {
 
 InternetRelayChat.prototype.updateChannelNames = function(channel) {
 	this.sendLine({"command": "NAMES", "args": [channel]});
+};
+
+InternetRelayChat.prototype.whois = function(nick) {
+	if(!this.whoisData[nick]) {
+		this.whoisData[nick] = {};
+	}
+	
+	this.whoisData[nick]._updating = true;
+	this.sendLine({"command": "WHOIS", "args": [nick]});
 };
