@@ -263,6 +263,49 @@ function InternetRelayChat(options) {
 	});
 }
 
+InternetRelayChat.colors = {
+	white: '\u000300',
+	black: '\u000301',
+	darkBlue: '\u000302',
+	darkGreen: '\u000303',
+	lightRed: '\u000304',
+	darkRed: '\u000305',
+	magenta: '\u000306',
+	orange: '\u000307',
+	yellow: '\u000308',
+	lightGreen: '\u000309',
+	cyan: '\u000310',
+	lightCyan: '\u000311',
+	lightBlue: '\u000312',
+	lightMagenta: '\u000313',
+	gray: '\u000314',
+	lightGray: '\u000315',
+	
+	bold: '\u000216',
+	underline: '\u001f17',
+	
+	reset: '\u000f'
+};
+
+InternetRelayChat.rawColors = {
+	white: '00',
+	black: '01',
+	darkBlue: '02',
+	darkGreen: '03',
+	lightRed: '04',
+	darkRed: '05',
+	magenta: '06',
+	orange: '07',
+	yellow: '08',
+	lightGreen: '09',
+	cyan: '10',
+	lightCyan: '11',
+	lightBlue: '12',
+	lightMagenta: '13',
+	gray: '14',
+	lightGray: '15'
+};
+
 InternetRelayChat.prototype.connect = function() {
 	var self = this;
 	var sockOptions = {"host": this.options.server, "port": this.options.port, "localAddress": this.options.localAddress};
