@@ -68,6 +68,7 @@ var defaultOptions = {
 	"autoReconnect": 15000, // If greater than zero, the client will wait this many milliseconds before reconnecting when the connection is lost (unless bot.quit is used)
 	"ssl": false, // If true, the connection will use SSL
 	"localAddress": null, // If specified, the client will bind to this local IP address
+	"vhost": null, // If specified, the client will report this vhost to the IRC server, otherwise it will be autodetected (via reverse DNS)
 	"floodDelay": 1000, // If greater than zero, the client will impose this delay (in milliseconds) between messages sent to the server
 	"debug": false // If true, the client will spew all network I/O to the console
 };
