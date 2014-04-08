@@ -66,7 +66,7 @@ var defaultOptions = {
 	"port": 6667, // The port to connect to
 	"password": false, // The password to use to connect to the server, or false for none
 	"autoReconnect": 15000, // If greater than zero, the client will wait this many milliseconds before reconnecting when the connection is lost (unless bot.quit is used)
-	"ssl": false, // If true, the connection will use SSL
+	"secure": false, // If true, the connection will use SSL/TLS
 	"localAddress": null, // If specified, the client will bind to this local IP address
 	"vhost": null, // If specified, the client will report this vhost to the IRC server, otherwise it will be autodetected (via reverse DNS)
 	"floodDelay": 1000, // If greater than zero, the client will impose this delay (in milliseconds) between messages sent to the server
@@ -76,13 +76,17 @@ var defaultOptions = {
 
 # Properties
 
+## connected
+
+This property will be `true` if the client is currently connected to an IRC server.
+
 ## registered
 
 This property will be `true` if the client is currently connected to and registered with an IRC server.
 
 ## secure
 
-This property will be `true` if the current connection is using SSL.
+This property will be `true` if the current connection is secure.
 
 ## myNick
 
