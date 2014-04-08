@@ -134,9 +134,10 @@ Emitted when the client receives a line from the IRC server
 
 Emitted when the client receives a command from the IRC server. `<command>` will be the command received. For example, `irc-privmsg` will be emitted when a `PRIVMSG` is received. You don't usually want to listen for these types of events since most important ones have their own events.
 
-There is one important case to note:
+There are two important cases to note:
 
-- `irc-ping` will be automatically caught and an appropriate `PONG` response will be sent by `node-internet-relay-chat`, but this will be suppressed if you bind any listeners to this event. If you bind a listener to `irc-ping`, make sure that you send the appropriate `PONG` response using `bot.sendLine`.
+- `irc-ping` will be automatically caught and an appropriate `PONG` response will be sent, but this will be suppressed if you bind any listeners to this event. If you bind a listener to `irc-ping`, make sure that you send the appropriate `PONG` response using `bot.sendLine`.
+- `irc-error` will be emitted before the IRC server terminates the connection.
 
 ## ctcp-<command>
 - `line` - A `line` object (see `Line Object` section below), with an additional `sender` property which is a `Sender Object`
