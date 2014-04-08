@@ -74,6 +74,42 @@ var defaultOptions = {
 };
 ```
 
+# Colors
+
+Colors are accessed directly through the required `IRC` object, not through any instantiated bots or clients. There are two ways to access colors:
+
+## IRC.colors
+
+Contains color codes that can be concatenated directly into strings.
+
+- white
+- black
+- darkBlue
+- darkGreen
+- lightRed
+- darkRed
+- magenta
+- orange
+- yellow
+- lightGreen
+- cyan
+- lightCyan
+- lightBlue
+- lightMagenta
+- gray
+- lightGray
+- bold
+- underline
+- reset
+
+## IRC.rawColors
+
+Contains only the numbers for the colors listed above (except bold, underline, and reset). You can turn these into IRC-ready color codes by prepending a '\u0003' character. To add a highlight, append a second color code separated by a comma.
+
+For example, to send the message "Hello, World!" in white with a black background, you would want to use something like this:
+
+    "\u0003" + IRC.rawColors.white + "," + IRC.rawColors.black + "Hello, World!"
+
 # Properties
 
 ## connected
