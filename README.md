@@ -237,6 +237,13 @@ Emitted when a notice is received, either directly to us or to a channel we're i
 
 Emitted when a message is sent to a channel that the bot is in.
 
+## action
+- `sender` - A `sender` object corresponding to the user that sent the message (see `Sender Object` section below)
+- `recipient` - The recipient of the action, whether our nick or a channel
+- `message` - The text of the action
+
+Emitted when an action (/me) is received, either directly to us in PM or to a channel we're in.
+
 # Methods
 
 ## connect()

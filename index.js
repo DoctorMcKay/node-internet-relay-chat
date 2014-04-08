@@ -42,7 +42,9 @@ function InternetRelayChat(options) {
 	});
 	
 	this.on('irc-privmsg', function(line) {
-		if(line.args[0] == self.myNick && line.tail.charAt(0) == '\u0001' && line.tail.charAt(line.tail.length - 1) == '\u0001') {
+		if(line.tail.indexOf('\u0001ACTION ') == 0 && line.tail.charAt(line.tail.length - 1) == '\u0001') {
+			self.emit('action', parseHostmask(line.prefix), line.args[0], line.tail.substring(8, line.tail.length - 1));
+		} else if(line.args[0] == self.myNick && line.tail.charAt(0) == '\u0001' && line.tail.charAt(line.tail.length - 1) == '\u0001') {
 			var ctcp = parseLine(line.tail.substring(1, line.tail.length - 1));
 			ctcp.sender = parseHostmask(line.prefix);
 			self.emit('ctcp-' + ctcp.command.toLowerCase(), ctcp);
