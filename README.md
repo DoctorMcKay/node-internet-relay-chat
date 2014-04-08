@@ -165,20 +165,20 @@ Emitted when the client disconnects from the IRC server for any reason.
 
 Emitted when the client receives a line from the IRC server
 
-## irc-<command>
+## irc-[command]
 - `line` - A `line` object (see `Line Object` section below)
 
-Emitted when the client receives a command from the IRC server. `<command>` will be the command received. For example, `irc-privmsg` will be emitted when a `PRIVMSG` is received. You don't usually want to listen for these types of events since most important ones have their own events.
+Emitted when the client receives a command from the IRC server. `[command]` will be the command received. For example, `irc-privmsg` will be emitted when a `PRIVMSG` is received. You don't usually want to listen for these types of events since most important ones have their own events.
 
 There are two important cases to note:
 
 - `irc-ping` will be automatically caught and an appropriate `PONG` response will be sent, but this will be suppressed if you bind any listeners to this event. If you bind a listener to `irc-ping`, make sure that you send the appropriate `PONG` response using `bot.sendLine`.
 - `irc-error` will be emitted before the IRC server terminates the connection.
 
-## ctcp-<command>
+## ctcp-[command]
 - `line` - A `line` object (see `Line Object` section below), with an additional `sender` property which is a `Sender Object`
 
-Emitted when the client receives a CTCP command from the IRC server. `<command>` will be the command received. For example, `ctcp-version` will be emitted when a `CTCP-VERSION` is received.
+Emitted when the client receives a CTCP command from the IRC server. `[command]` will be the command received. For example, `ctcp-version` will be emitted when a `CTCP-VERSION` is received.
 
 There are three important cases to note:
 
@@ -191,7 +191,7 @@ There are three important cases to note:
 
 Emitted when the client receives any numeric reply from the IRC server. See [RFC 1459](http://tools.ietf.org/html/rfc1459.html#section-6) for an enumeration. Most clients display numeric replies to the client in a similar format as a `NOTICE`.
 
-## numeric<class>
+## numeric[class]
 - `line` - A `line` object (see `Line Object` section below)
 
 Emitted when the client receives any numeric reply of a specific class from the IRC server. For example, a `433` reply will emit `numeric4`.
