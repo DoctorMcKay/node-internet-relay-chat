@@ -321,6 +321,10 @@ InternetRelayChat.prototype.sendLine = function(line, callback) {
 	
 	var self = this;
 	setTimeout(function() {
+		if(!self.connected) {
+			return;
+		}
+		
 		self.sendRawLine(makeLine(line));
 		if(callback) {
 			callback();
