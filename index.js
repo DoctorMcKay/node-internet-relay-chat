@@ -64,14 +64,24 @@ function InternetRelayChat(options) {
 	
 	this.on('irc-join', function(line) {
 		var joiner = parseHostmask(line.prefix);
-		self._addToChannel(joiner.nick, line.tail);
-		self.emit('join', joiner, line.tail);
+		var channel = line.args[0];
+		if(!channel) {
+			channel = line.tail;
+		}
+		
+		self._addToChannel(joiner.nick, channel);
+		self.emit('join', joiner, channel);
 	});
 	
 	this.on('irc-part', function(line) {
 		var user = parseHostmask(line.prefix);
-		self._removeFromChannel(user.nick, line.tail);
-		self.emit('part', user, line.tail);
+		var channel = line.args[0];
+		if(!channel) {
+			channel = line.tail;
+		}
+		
+		self._removeFromChannel(user.nick, channel);
+		self.emit('part', user, channel);
 	});
 	
 	this.on('irc-kick', function(line) {
