@@ -296,6 +296,10 @@ Sends a message to a recipient. `recipient` should be either a nick (for a priva
 
 Sends a notice to a recipient. `recipient` should be either a nick (for a private message) or a channel (for a channel notice) starting with the appropriate channel prefix. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
 
+## action(recipient, message, [callback])
+
+Sends an action (/me) to a recipient. `recipient` should be either a nick (for a private message) or a channel (for a channel message) starting with the appropriate channel prefix. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
+
 ## join(channel, [key], [callback])
 
 Joins a `channel`, optionally using the specified `key`. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).

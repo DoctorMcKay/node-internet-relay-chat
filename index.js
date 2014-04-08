@@ -486,6 +486,10 @@ InternetRelayChat.prototype.notice = function(recipient, message, callback) {
 	this.sendLine({"command": "NOTICE", "args": [recipient], tail: message}, callback);
 };
 
+InternetRelayChat.prototype.action = function(recipient, message, callback) {
+	this.sendLine({"command": "PRIVMSG", "args": [recipient], tail: "\u0001ACTION " + message + "\u0001"}, callback);
+};
+
 InternetRelayChat.prototype.join = function(channel, key, callback) {
 	this.sendLine({"command": "JOIN", "args": [channel, key]}, callback);
 };
