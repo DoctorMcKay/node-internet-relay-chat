@@ -400,10 +400,6 @@ InternetRelayChat.prototype._handleConnect = function() {
 		dns.reverse(this.socket.address().address, function(err, domains) {
 			// Silently ignore errors
 			var hostname = (domains && domains[0]) || self.socket.address().address;
-			if(domains.indexOf(self.options.localAddress) != -1) {
-				hostname = self.options.localAddress;
-			}
-			
 			self.sendLine({"command": "USER", "args": [self.options.nick, hostname, self.socket.address().address], "tail": self.options.realname});
 		});
 	}
