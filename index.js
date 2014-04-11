@@ -399,7 +399,7 @@ InternetRelayChat.prototype._handleConnect = function() {
 	} else {
 		dns.reverse(this.socket.address().address, function(err, domains) {
 			// Silently ignore errors
-			var hostname = domains[0] || self.socket.address().address;
+			var hostname = (domains && domains[0]) || self.socket.address().address;
 			if(domains.indexOf(self.options.localAddress) != -1) {
 				hostname = self.options.localAddress;
 			}
