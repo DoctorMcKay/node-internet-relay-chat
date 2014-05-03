@@ -113,7 +113,8 @@ function InternetRelayChat(options) {
 		self.emit('mode', changer, line.args[0], line.args[1], line.args.slice(2));
 		
 		if(line.args.length > 2) {
-			var prefixModes = self.support.prefix.match(/\([a-zA-Z]+\)/)[0];
+			var prefixes = self.support.prefix || "(qaohv)~&@%+";
+			var prefixModes = prefixes.match(/\([a-zA-Z]+\)/)[0];
 			for(var i = 1; i < prefixModes.length - 1; i++) {
 				if(line.args[1].indexOf(prefixModes.charAt(i))) {
 					// Prefixes changed!
