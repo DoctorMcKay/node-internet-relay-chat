@@ -283,7 +283,8 @@ InternetRelayChat.colors = {
 	lightGray: '\u000315',
 	
 	bold: '\u0002',
-	italic: '\u0016',
+	reverse: '\u0016',
+	italic: '\u001d',
 	underline: '\u001f',
 	
 	reset: '\u000f'
