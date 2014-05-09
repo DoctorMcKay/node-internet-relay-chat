@@ -101,13 +101,14 @@ Contains color codes that can be concatenated directly into strings.
 - gray
 - lightGray
 - bold
+- reverse
 - italic
 - underline
 - reset
 
 ## IRC.rawColors
 
-Contains only the numbers for the colors listed above (except bold, italic, underline, and reset). You can turn these into IRC-ready color codes by prepending a '\u0003' character. To add a highlight, append a second color code separated by a comma.
+Contains only the numbers for the colors listed above (except bold, reverse, italic, underline, and reset). You can turn these into IRC-ready color codes by prepending a '\u0003' character. To add a highlight, append a second color code separated by a comma.
 
 For example, to send the message "Hello, World!" in white with a black background, you would want to use something like this:
 
