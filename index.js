@@ -398,12 +398,12 @@ InternetRelayChat.prototype._handleConnect = function() {
 	
 	this.nick(this.options.nick);
 	if(this.options.vhost) {
-		this.sendLine({"command": "USER", "args": [this.options.nick, this.options.vhost, this.socket.address().address], "tail": this.options.realname});
+		this.sendLine({"command": "USER", "args": [this.options.username, this.options.vhost, this.socket.address().address], "tail": this.options.realname});
 	} else {
 		dns.reverse(this.socket.address().address, function(err, domains) {
 			// Silently ignore errors
 			var hostname = (domains && domains[0]) || self.socket.address().address;
-			self.sendLine({"command": "USER", "args": [self.options.nick, hostname, self.socket.address().address], "tail": self.options.realname});
+			self.sendLine({"command": "USER", "args": [self.options.username, hostname, self.socket.address().address], "tail": self.options.realname});
 		});
 	}
 };
