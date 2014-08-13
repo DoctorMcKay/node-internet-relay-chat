@@ -592,8 +592,14 @@ InternetRelayChat.prototype.join = function(channel, key, callback) {
 	this.sendLine({"command": "JOIN", "args": [channel, key]}, callback);
 };
 
-InternetRelayChat.prototype.part = function(channel, callback) {
-	this.sendLine({"command": "PART", "args": [channel]}, callback);
+InternetRelayChat.prototype.part = function(channel, message, callback) {
+	if(typeof message == 'function') {
+		callback = message;
+	} else if(typeof message != 'string') {
+		message = undefined;
+	}
+	
+	this.sendLine({"command": "PART", "args": [channel], "tail": message}, callback);
 };
 
 InternetRelayChat.prototype.updateChannelNames = function(channel) {
