@@ -595,7 +595,9 @@ InternetRelayChat.prototype.join = function(channel, key, callback) {
 InternetRelayChat.prototype.part = function(channel, message, callback) {
 	if(typeof message == 'function') {
 		callback = message;
-	} else if(typeof message != 'string') {
+	}
+	
+	if(typeof message != 'string') {
 		message = undefined;
 	}
 	
