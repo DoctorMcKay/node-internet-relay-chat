@@ -187,7 +187,7 @@ Emitted when the client receives a CTCP command from the IRC server. `[command]`
 There are three important cases to note:
 
 - `ctcp-ping` will be automatically caught and an appropriate response will be sent to the sender. If you bind a listener to this event, the automatic response will be suppressed. Make sure that you send a response if you desire.
-- `ctcp-time` will be automatically caught and an appropriate response will be sent to the sender. If you bind a listener to this event, the automatic response will be suppressed. MAke sure that you send a response if you desire.
+- `ctcp-time` will be automatically caught and an appropriate response will be sent to the sender. If you bind a listener to this event, the automatic response will be suppressed. Make sure that you send a response if you desire.
 - Many IRC servers require clients to respond to `ctcp-version` requests. You may want to listen for this event and send an appropriate response (using `bot.ctcpReply`).
 
 ## numeric
@@ -237,7 +237,7 @@ Emitted when a user is kicked from a channel. This will not be emitted when a us
 - `channels` - An array of channel names that we saw this user in
 - `message` - The quit message, if any
 
-Emitted when a user in one of the channels that we're in quits from the server. This will not be emitted when a user in a channel that we're in is killed, is kicked, or parts gracefully. This will not be emitted when we quit.
+Emitted when a user in one of the channels that we're in quits from the server or is killed. This will not be emitted when a user in a channel that we're in is kicked, or parts gracefully. This will not be emitted when we quit.
 
 ## mode
 - `changer` - A `sender` object corresponding to the user that changed the mode
