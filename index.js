@@ -467,9 +467,9 @@ function parseLine(rawLine) {
 	}
 	
 	// If the line has a tail, grab it and strip it out
-	if(rawLine.indexOf(':') != -1) {
-		line.tail = rawLine.substring(rawLine.indexOf(':') + 1);
-		rawLine = rawLine.substring(0, rawLine.indexOf(':'));
+	if(rawLine.indexOf(' :') != -1) {
+		line.tail = rawLine.substring(rawLine.indexOf(' :') + 2);
+		rawLine = rawLine.substring(0, rawLine.indexOf(' :'));
 	}
 	
 	rawLine = rawLine.trim();
