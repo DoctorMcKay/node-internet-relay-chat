@@ -357,7 +357,7 @@ function InternetRelayChat(options) {
 	this.on('irc-329', function(line) {
 		// Channel created time
 		var channel = line.args[1];
-		self.channels[channel].created = line.args[2];
+		self.channels[channel].created = parseInt(line.args[2]);
 		self._checkChannel(channel);
 	});
 	
