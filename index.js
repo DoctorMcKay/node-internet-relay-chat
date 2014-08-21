@@ -73,11 +73,17 @@ function InternetRelayChat(options) {
 		if(joiner.nick == self.myNick) {
 			self.channels[channel] = {
 				"nicks": [],
-				"users": {}
+				"users": {},
+				"updatingNames": false
 			};
+			
+			self.sendLine({"command": "MODE", "args": [channel]});
+			self.sendLine({"command": "TOPIC", "args": [channel]});
+		} else {
+			// Don't call _addToChannel for ourselves, as we'll get our data once we get NAMES
+			self._addToChannel(joiner.nick, channel);
 		}
 		
-		self._addToChannel(joiner.nick, channel);
 		self.emit('join', joiner, channel);
 	});
 	
@@ -111,6 +117,20 @@ function InternetRelayChat(options) {
 		self.emit('quit', quitter, channels, line.tail);
 	});
 	
+	this.on('irc-topic', function(line) {
+		var changer = parseHostmask(line.prefix);
+		var channel = line.args[0];
+		var topic = line.tail;
+		
+		if(topic.length == 0) {
+			topic = false;
+		}
+		
+		self.emit('topic', changer, channel, topic);
+		
+		self.channels[channel].topic = topic;
+	});
+	
 	this.on('irc-mode', function(line) {
 		var changer = parseHostmask(line.prefix);
 		if(!line.args[1] && line.tail) {
@@ -120,7 +140,9 @@ function InternetRelayChat(options) {
 		var channel = line.args[0];
 		self.emit('mode', changer, channel, line.args[1], line.args.slice(2));
 		
-		if(line.args.length > 2) {
+		var chan = self.channels[channel];
+		
+		if(channel != self.myNick) {
 			var prefixes = self._getPrefixes();
 			var modes = self._getChanModes();
 			
@@ -132,9 +154,38 @@ function InternetRelayChat(options) {
 					isSetting = true;
 				} else if(mode == '-') {
 					isSetting = false;
-				} else if(modes.list.indexOf(mode) != -1 || modes.alwaysParam.indexOf(mode) != -1 || (isSetting && modes.paramWhenSet.indexOf(mode) != -1)) {
-					currentArg++;
-				} else {
+				} else if(modes.alwaysParam.indexOf(mode) != -1 || modes.paramWhenSet.indexOf(mode) != -1) {
+					if(chan.modes != undefined) {
+						if(isSetting) {
+							var exists = false;
+							for(var j = 0; j < chan.modes.length; j++) {
+								if(chan.modes[j].charAt(0) == mode) {
+									exists = true;
+									chan.modes[j] = mode + ' ' + line.args[currentArg];
+									break;
+								}
+							}
+							
+							if(!exists) {
+								chan.modes.push(mode + ' ' + line.args[currentArg]);
+							}
+						} else {
+							for(var j = 0; j < chan.modes.length; j++) {
+								if(chan.modes[j].charAt(0) == mode) {
+									chan.modes.splice(j, 1);
+									break;
+								}
+							}
+						}
+					}
+					
+					if(isSetting || modes.paramWhenSet.indexOf(mode) == -1) {
+						// Only increment arg if it's being set or it's not a param-when-set
+						currentArg++;
+					}
+				} else if(modes.list.indexOf(mode) == -1) {
+					// This isn't a list mode, which we want to ignore entirely
+					
 					// Check if this mode is a prefix mode
 					var prefix = false;
 					for(var j = 0; j < prefixes.length; j++) {
@@ -145,6 +196,18 @@ function InternetRelayChat(options) {
 					}
 					
 					if(!prefix) {
+						// We need to update the channel modes
+						if(chan.modes != undefined) {
+							if(isSetting && chan.modes.indexOf(mode) == -1) {
+								chan.modes.push(mode);
+							} else if(!isSetting) {
+								var index = chan.modes.indexOf(mode);
+								if(index != -1) {
+									chan.modes.splice(index, 1);
+								}
+							}
+						}
+						
 						continue;
 					}
 					
@@ -259,6 +322,7 @@ function InternetRelayChat(options) {
 	});
 	
 	this.on('irc-005', function(line) {
+		// Support
 		for(var i = 0; i < line.args.length; i++) {
 			if(line.args[i] == self.myNick) {
 				continue;
@@ -267,6 +331,48 @@ function InternetRelayChat(options) {
 			var arg = line.args[i].split('=');
 			self.support[arg[0].toLowerCase()] = arg[1];
 		}
+	});
+	
+	this.on('irc-324', function(line) {
+		// Channel modes
+		var channel = line.args[1];
+		var currentArg = 3;
+		var data = [];
+		
+		var modes = self._getChanModes();
+		for(var i = 1; i < line.args[2].length; i++) { // 1 to skip over the +
+			var mode = line.args[2].charAt(i);
+			if(modes.list.indexOf(mode) != -1 || modes.alwaysParam.indexOf(mode) != -1 || modes.paramWhenSet.indexOf(mode) != -1) {
+				data.push(mode + ' ' + line.args[currentArg]);
+				currentArg++;
+			} else {
+				data.push(mode);
+			}
+		}
+		
+		self.channels[channel].modes = data;
+		self._checkChannel(channel);
+	});
+	
+	this.on('irc-329', function(line) {
+		// Channel created time
+		var channel = line.args[1];
+		self.channels[channel].created = line.args[2];
+		self._checkChannel(channel);
+	});
+	
+	this.on('irc-331', function(line) {
+		// No topic is set
+		var channel = line.args[1];
+		self.channels[channel].topic = false;
+		self._checkChannel(channel);
+	});
+	
+	this.on('irc-332', function(line) {
+		// Channel topic
+		var channel = line.args[1];
+		self.channels[channel].topic = line.tail;
+		self._checkChannel(channel);
 	});
 	
 	this.on('irc-353', function(line) {
@@ -310,6 +416,7 @@ function InternetRelayChat(options) {
 		var channel = line.args[line.args.length - 1];
 		self.channels[channel].updatingNames = false;
 		self.emit('names', channel);
+		self._checkChannel(channel);
 	});
 	
 	this.on('irc-376', function(line) {
@@ -675,6 +782,15 @@ InternetRelayChat.prototype._isInChannel = function(nick, channel) {
 	}
 	
 	return -1;
+};
+
+// Checks if all of a channel's data has been received so we can emit the "channel" event
+InternetRelayChat.prototype._checkChannel = function(channel) {
+	var chan = this.channels[channel];
+	if(!chan.dataLoaded && chan.users[this.myNick] && chan.modes != undefined && chan.created != undefined && chan.topic != undefined) {
+		chan.dataLoaded = true;
+		this.emit('channel', channel);
+	}
 };
 
 InternetRelayChat.prototype.nick = function(newNick, callback) {
