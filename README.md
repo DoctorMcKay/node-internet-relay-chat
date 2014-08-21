@@ -324,7 +324,7 @@ Emitted when numeric 318 (End of /WHOIS list) is received from the IRC server. T
 Emitted when a private message is received (one that is sent directly to the bot, not to a channel).
 
 ## notice
-- `sender` - A `sender` object corresponding to the user that sent the message (see `Sender Object` section below)
+- `sender` - A `sender` object corresponding to the user that sent the message (see `Sender Object` section below), possibly `null` if it's a notice from the server
 - `recipient` - The recipient of the notice, either our nick or a channel
 - `message` - The message that was sent
 
