@@ -864,7 +864,7 @@ InternetRelayChat.prototype.whois = function(nick) {
 	this.sendLine({"command": "WHOIS", "args": [nick]});
 };
 
-InternetRelayChat.prototype.mode = function(channel, modes) {
+InternetRelayChat.prototype.mode = function(channel, modes, callback) {
 	var args = [channel].concat(modes.split(' '));
-	this.sendLine({"command": "MODE", "args": args});
+	this.sendLine({"command": "MODE", "args": args}, callback);
 };
