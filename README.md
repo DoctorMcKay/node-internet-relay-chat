@@ -136,6 +136,49 @@ The bot's current nickname.
 
 An object containing all features that the IRC server supports (as reported by the 005 message).
 
+## channels
+
+An object containing the channels that the bot is currently in. It looks like this:
+
+```js
+{
+	"#channel" {
+		"nicks": ["@Op1", "@Op2", "+Voice1", "+Voice2", "User1", "User2"],
+		"users": {
+			"Op1": {
+				"prefix": "@",
+				"access": ["o", "v"]
+			},
+			"Op2": {
+				"prefix": "@",
+				"access": ["o"]
+			},
+			"Voice1": {
+				"prefix": "+",
+				"access": ["v"]
+			},
+			"Voice2": {
+				"prefix": "+",
+				"access": ["v"]
+			},
+			"User1": {
+				"prefix": "",
+				"access": []
+			},
+			"User2": {
+				"prefix": "",
+				"access": []
+			}
+		},
+		"updatingNames": false
+	}
+}
+```
+
+The `nicks` array is only present for backwards-compatibility, you should use the `users` object instead of it. The nicks and access arrays have no guaranteed order.
+
+The `updatingNames` property will be `true` if we have received at least one `353` numeric and no finishing `366` numeric.
+
 ## options
 
 An object representing the current connection's options, as defined in the constructor. The only properties that you should change are `autoReconnect` and `floodDelay`.
