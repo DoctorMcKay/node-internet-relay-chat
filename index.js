@@ -220,8 +220,10 @@ function InternetRelayChat(options) {
 					
 					var user = self.channels[channel].users[nick];
 					if(isSetting && user.access.indexOf(mode) == -1) {
+						self.emit('access', changer, channel, nick, true, mode);
 						user.access.push(mode);
 					} else if(!isSetting && user.access.indexOf(mode) != -1) {
+						self.emit('access', changer, channel, nick, false, mode);
 						var index = user.access.indexOf(mode);
 						user.access.splice(index, 1);
 					}
