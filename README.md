@@ -309,6 +309,22 @@ Examples:
 - Multiple users 'foo' and 'bar' voiced: `mode = "+vv"`, `args = ["foo", "bar"]`
 - User 'foo' voiced and user 'bar' deopped: `mode = "+v-o"`, `args = ["foo", "bar"]`
 
+## access
+- `changer` - A `sender` object corresponding to the user that changed the access
+- `channel` - The channel in which access was granted or revoked
+- `nick` - The nick of the user whose access was changed
+- `granted` - `true` if access was granted, `false` if it was revoked
+- `mode` - The access mode that was granted or revoked
+
+Emitted when a user's access (voice, halfop, op, admin, etc) is changed.
+
+Examples:
+
+- User 'foo' voiced in '#channel': `channel = "#channel"`, `nick = "foo"`, `granted = true`, `mode = "v"`
+- User 'bar' deopped in '#channel': `channel = "#channel"`, `nick = "bar"`, `granted = false`, `mode = "o"`
+
+If multiple users' access is changed in a single MODE change, this will be emitted once for each user. Crazy stuff like +o-o foo foo will emit two identical events, although `granted` will be `true` and then `false`.
+
 ## names
 - `channel` - Channel for which we just got updated names
 
