@@ -110,16 +110,70 @@ function InternetRelayChat(options) {
 			line.args[1] = line.tail;
 		}
 		
-		self.emit('mode', changer, line.args[0], line.args[1], line.args.slice(2));
+		var channel = line.args[0];
+		self.emit('mode', changer, channel, line.args[1], line.args.slice(2));
 		
 		if(line.args.length > 2) {
-			var prefixes = self.support.prefix || "(qaohv)~&@%+";
-			var prefixModes = prefixes.match(/\([a-zA-Z]+\)/)[0];
-			for(var i = 1; i < prefixModes.length - 1; i++) {
-				if(line.args[1].indexOf(prefixModes.charAt(i))) {
-					// Prefixes changed!
-					self.updateChannelNames(line.args[0]);
-					break;
+			var prefixes = self._getPrefixes();
+			var modes = self._getChanModes();
+			
+			var currentArg = 2;
+			var isSetting = true;
+			for(var i = 0; i < line.args[1].length; i++) {
+				var mode = line.args[1].charAt(i);
+				if(mode == '+') {
+					isSetting = true;
+				} else if(mode == '-') {
+					isSetting = false;
+				} else if(modes.list.indexOf(mode) != -1 || modes.alwaysParam.indexOf(mode) != -1 || (isSetting && modes.paramWhenSet.indexOf(mode) != -1)) {
+					currentArg++;
+				} else {
+					// Check if this mode is a prefix mode
+					var prefix = false;
+					for(var j = 0; j < prefixes.length; j++) {
+						if(prefixes[j].mode == mode) {
+							prefix = prefixes[j];
+							break;
+						}
+					}
+					
+					if(!prefix) {
+						continue;
+					}
+					
+					// This is a prefix mode
+					var nick = line.args[currentArg];
+					currentArg++;
+					if(!self.channels[channel] || !self.channels[channel].users[nick]) {
+						continue; // This shouldn't happen!
+					}
+					
+					var user = self.channels[channel].users[nick];
+					if(isSetting && user.access.indexOf(mode) == -1) {
+						user.access.push(mode);
+					} else if(!isSetting && user.access.indexOf(mode) != -1) {
+						var index = user.access.indexOf(mode);
+						user.access.splice(index, 1);
+					}
+					
+					// Recalculate the user's prefix
+					var highestMode = false;
+					for(var j = 0; j < prefixes.length; j++) {
+						if(user.access.indexOf(prefixes[j].mode) != -1) {
+							highestMode = prefixes[j].prefix;
+							break;
+						}
+					}
+					
+					if(highestMode) {
+						user.prefix = highestMode;
+						var index = self._isInChannel(nick, channel);
+						if(index != -1) {
+							self.channels[channel].nicks[index] = highestMode + nick;
+						}
+					} else {
+						user.prefix = '';
+					}
 				}
 			}
 		}
@@ -211,11 +265,36 @@ function InternetRelayChat(options) {
 	this.on('irc-353', function(line) {
 		// NAMES list
 		var channel = line.args[line.args.length - 1];
+		var names = line.tail.split(' ');
+		var prefixes = self._getPrefixes();
 		if(!self.channels[channel].updatingNames) {
 			self.channels[channel].updatingNames = true;
-			self.channels[channel].nicks = line.tail.split(' ');
+			self.channels[channel].nicks = names;
+			self.channels[channel].users = {};
 		} else {
-			self.channels[channel].nicks.concat(line.tail.split(' '));
+			self.channels[channel].nicks.concat(names);
+		}
+		
+		for(var i = 0; i < names.length; i++) {
+			if(self._nickHasPrefix(names[i])) {
+				var access;
+				for(var j = 0; j < prefixes.length; j++) {
+					if(names[i].charAt(0) == prefixes[j].prefix) {
+						access = prefixes[j].mode;
+						break;
+					}
+				}
+				
+				self.channels[channel].users[names[i].substring(1)] = {
+					"prefix": names[i].charAt(0),
+					"access": [access]
+				};
+			} else {
+				self.channels[channel].users[names[i]] = {
+					"prefix": '',
+					"access": []
+				};
+			}
 		}
 	});
 	
@@ -504,18 +583,28 @@ function parseHostmask(hostmask) {
 }
 
 InternetRelayChat.prototype._addToChannel = function(nick, channel) {
-	var self = this;
 	if(nick == this.myNick) {
-		this.channels[channel] = {"nicks": [self.myNick]};
+		this.channels[channel] = {
+			"nicks": [nick], // Redundant, but keeps backwards-compatibility
+			"users": {}
+		};
+		
+		this.channels[channel].users[nick] = {
+			"prefix": '',
+			"access": []
+		};
+		
 		return;
 	}
 	
-	var index = this._isInChannel(nick, channel);
-	if(index != -1) {
-		return;
+	if(!this.channels[channel].users[nick]) {
+		this.channels[channel].users[nick] = {
+			"prefix": '',
+			"access": []
+		}
+		
+		this.channels[channel].nicks.push(nick);
 	}
-	
-	this.channels[channel].nicks.push(nick);
 };
 
 InternetRelayChat.prototype._removeFromChannel = function(nick, channel) {
@@ -524,12 +613,10 @@ InternetRelayChat.prototype._removeFromChannel = function(nick, channel) {
 		return;
 	}
 	
-	var index = this._isInChannel(nick, channel);
-	if(index == -1) {
-		return;
+	if(this.channels[channel].users[nick]) {
+		delete this.channels[channel].users[nick];
+		this.channels[channel].nicks.splice(this._isInChannel(nick, channel), 1);
 	}
-	
-	this.channels[channel].nicks.splice(index, 1);
 };
 
 InternetRelayChat.prototype._nickHasPrefix = function(nick) {
@@ -541,6 +628,41 @@ InternetRelayChat.prototype._nickHasPrefix = function(nick) {
 	}
 	
 	return prefixes.indexOf(nick.charAt(0)) != -1;
+};
+
+InternetRelayChat.prototype._getPrefixes = function() {
+	var prefixSupport = this.support.prefix || "(qaohv)~&@%+";
+	var prefixes = []; // We're using an array since order is important, the highest mode determines the prefix
+	
+	var letters = prefixSupport.substring(1, prefixSupport.indexOf(')'));
+	var symbols = prefixSupport.substring(prefixSupport.indexOf(')') + 1);
+	
+	for(var i = 0; i < letters.length; i++) {
+		prefixes.push({
+			"mode": letters.charAt(i),
+			"prefix": symbols.charAt(i)
+		});
+	}
+	
+	return prefixes;
+};
+
+InternetRelayChat.prototype._getChanModes = function() {
+	var modeSupport = this.support.chanmodes;
+	var modes =	{
+		"list": [], // Modes that add an item to a list and always have a parameter
+		"alwaysParam": [], // Modes that always have a parameter
+		"paramWhenSet": [], // Modes that have a parameter when set
+		"noParam": [] // Modes that never have a parameter
+	};
+	
+	var parts = modeSupport.split(',');
+	modes.list = parts[0].split('');
+	modes.alwaysParam = parts[1].split('');
+	modes.paramWhenSet = parts[2].split('');
+	modes.noParam = parts[3].split('');
+	
+	return modes;
 };
 
 InternetRelayChat.prototype._isInChannel = function(nick, channel) {
