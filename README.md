@@ -450,6 +450,18 @@ Joins a `channel`, optionally using the specified `key`. `callback` will be call
 
 Leaves a `channel`. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
 
+## mode(channel, modes, [callback])
+
+Sets or unsets `modes` on a `channel`. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
+
+`modes` should be a string representing the modes to +set or -unset, followed by any applicable args with appropriate spacing.
+
+Examples:
+
+- Set a channel's key to "foo" and unset it as moderated: `modes = "+k-m foo"`
+- Op a user named "foo": `modes = "+o foo"
+- Disable colors in a channel: `modes = "+c"`
+
 ## updateChannelNames(channel)
 
 Sends a request to the IRC server for the full list of nicks in `channel`. The `names` event will be emitted when the response is received.
@@ -457,6 +469,16 @@ Sends a request to the IRC server for the full list of nicks in `channel`. The `
 ## whois(nick)
 
 Sends a request to the IRC server for a user's information. The `whois` event will be emitted when the full response is received.
+
+## userHasMode(channel, nick, mode)
+
+Returns `true` if a `nick` has an access `mode` in a `channel`, or `false` if we're not in that channel, the nick in question is not in that channel, or it doesn't have the access mode.
+
+For example, to check if a user named "foo" is an op in #channel, you'd pass `channel = "#channel"`, `nick = "foo"`, `mode = "o"`
+
+**Note:** If the user received this access mode before we entered the channel and their highest mode when we last got NAMES (which was when we entered the channel unless you called `updateChannelNames`) was higher, this will return `false`.
+
+For example, user "foo" received +ov before we entered the channel, so they were a voiced op. When we entered, we only saw @ so we only know them as an op. If they have since been set -o, we don't know about the +v mode so we think that they have no access at all.
 
 # Line Object
 
