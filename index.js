@@ -70,6 +70,13 @@ function InternetRelayChat(options) {
 			channel = line.tail;
 		}
 		
+		if(joiner.nick == self.myNick) {
+			self.channels[channel] = {
+				"nicks": [],
+				"users": {}
+			};
+		}
+		
 		self._addToChannel(joiner.nick, channel);
 		self.emit('join', joiner, channel);
 	});
@@ -583,20 +590,6 @@ function parseHostmask(hostmask) {
 }
 
 InternetRelayChat.prototype._addToChannel = function(nick, channel) {
-	if(nick == this.myNick) {
-		this.channels[channel] = {
-			"nicks": [nick], // Redundant, but keeps backwards-compatibility
-			"users": {}
-		};
-		
-		this.channels[channel].users[nick] = {
-			"prefix": '',
-			"access": []
-		};
-		
-		return;
-	}
-	
 	if(!this.channels[channel].users[nick]) {
 		this.channels[channel].users[nick] = {
 			"prefix": '',
