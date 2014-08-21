@@ -795,6 +795,20 @@ InternetRelayChat.prototype._checkChannel = function(channel) {
 	}
 };
 
+InternetRelayChat.prototype.userHasMode = function(channel, nick, mode) {
+	var chan = this.channels[channel];
+	if(!chan) {
+		return false;
+	}
+	
+	var user = chan.users[nick];
+	if(!user) {
+		return false;
+	}
+	
+	return user.access.indexOf(mode) != -1;
+};
+
 InternetRelayChat.prototype.nick = function(newNick, callback) {
 	this._oldNick = this.myNick;
 	this.myNick = newNick;
