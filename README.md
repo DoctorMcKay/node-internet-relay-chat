@@ -170,7 +170,11 @@ An object containing the channels that the bot is currently in. It looks like th
 				"access": []
 			}
 		},
-		"updatingNames": false
+		"updatingNames": false,
+		"modes": ["n", "t", "k foo", "l 5"],
+		"created": 1396133159,
+		"topic": "Channel Topic",
+		"dataLoaded": true
 	}
 }
 ```
@@ -178,6 +182,16 @@ An object containing the channels that the bot is currently in. It looks like th
 The `nicks` array is only present for backwards-compatibility, you should use the `users` object instead of it. The nicks and access arrays have no guaranteed order.
 
 The `updatingNames` property will be `true` if we have received at least one `353` numeric and no finishing `366` numeric.
+
+The `modes` property is an array of channel modes. Modes which have a parameter (such as +k) include their parameter after a space.
+
+The `created` property contains the UNIX timestamp of when the channel was created.
+
+The `topic` property contains the channel's topic. It may be `false` if the channel has no topic.
+
+The `dataLoaded` property is `true` if all channel data has been received from the server. This is used internally, although you may wish to check it to see if a channel's data is fully loaded yet.
+
+The `channel` event will be emitted when this data has been populated. You shouldn't try to access a channel's data before this event is emitted.
 
 ## options
 
@@ -299,6 +313,18 @@ Examples:
 - `channel` - Channel for which we just got updated names
 
 Emitted when the full list of nicknames in a `channel` is received. The array (with nick prefixes) can be accessed via `bot.channels[channel].nicks`.
+
+## channel
+- `channel` - The channel for which we now have data
+
+Emitted when a channel's full data is now available at `bot.channels[channel]`. See the `channels` property in the **Properties** section above for more information.
+
+## topic
+- `changer` - A `sender` object corresponding to the user that just changed the topic (see `Sender Object` section below)
+- `channel` - Channel whose topic just changed
+- `topic` - The channel's new topic
+
+Emitted when a channel's topic is changed. `topic` will be `false` if the topic was removed. The `topic` property of `bot.channels[channel]` will be updated after this is emitted, so you can get it from there to compare the old and new topics.
 
 ## whois
 - `nick` - The nick of the user we received data for
