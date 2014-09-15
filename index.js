@@ -868,3 +868,7 @@ InternetRelayChat.prototype.mode = function(channel, modes, callback) {
 	var args = [channel].concat(modes.split(' '));
 	this.sendLine({"command": "MODE", "args": args}, callback);
 };
+
+InternetRelayChat.prototype.topic = function(channel, topic, callback) {
+	this.sendLine({"command": "TOPIC", "args": [channel], "tail": topic}, callback);
+};

@@ -462,6 +462,10 @@ Examples:
 - Op a user named "foo": `modes = "+o foo"
 - Disable colors in a channel: `modes = "+c"`
 
+## topic(channel, topic, [callback])
+
+Changes the `topic` of a `channel`. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
+
 ## updateChannelNames(channel)
 
 Sends a request to the IRC server for the full list of nicks in `channel`. The `names` event will be emitted when the response is received.
