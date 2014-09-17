@@ -142,7 +142,7 @@ An object containing the channels that the bot is currently in. It looks like th
 
 ```js
 {
-	"#channel" {
+	"#channel": {
 		"nicks": ["@Op1", "@Op2", "+Voice1", "+Voice2", "User1", "User2"],
 		"users": {
 			"Op1": {
@@ -446,9 +446,9 @@ Sends an action (/me) to a recipient. `recipient` should be either a nick (for a
 
 Joins a `channel`, optionally using the specified `key`. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
 
-## part(channel, [callback])
+## part(channel, [message], [callback])
 
-Leaves a `channel`. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
+Leaves a `channel` with an optional `message`. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
 
 ## mode(channel, modes, [callback])
 
