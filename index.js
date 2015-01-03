@@ -298,7 +298,7 @@ function InternetRelayChat(options) {
 					break;
 				case 319:
 					// Channel list, may be repeated for large numbers of channels
-					data.channels.concat(line.tail.split(' '));
+					data.channels = data.channels.concat(line.tail.trim().split(' '));
 					break;
 			}
 			
