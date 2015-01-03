@@ -253,10 +253,10 @@ function InternetRelayChat(options) {
 	
 	this.on('numeric3', function(line) {
 		var whoisNumerics = [301, 311, 312, 313, 317, 318, 319];
-		if(whoisNumerics.indexOf(line.command) != -1) {
+		if(whoisNumerics.indexOf(parseInt(line.command, 10)) != -1) {
 			// It's a WHOIS reply
 			if(line.args[0] == self.myNick) {
-				line.args.splice(0);
+				line.args.splice(0, 1);
 			}
 			
 			var data;
