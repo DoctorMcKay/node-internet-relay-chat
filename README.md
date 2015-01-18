@@ -114,6 +114,15 @@ For example, to send the message "Hello, World!" in white with a black backgroun
 
     "\u0003" + IRC.rawColors.white + "," + IRC.rawColors.black + "Hello, World!"
 
+## IRC.banFlags
+
+Contains the available flags for use in the [`ban`](#banchannel-user-flags-message-callback) method. These are bitwise flags, so you should combine them with the `|` operator.
+
+- `nick` - Ban the user by their nickname
+- `user` - Ban the user by their username (ident)
+- `host` - Ban the user by their hostname
+- `kick` - In addition to setting +b, also kick the user
+
 # Properties
 
 ## connected
@@ -455,6 +464,18 @@ Leaves a `channel` with an optional `message`. `callback` will be called, if pro
 Sets or unsets `modes` on a `channel`. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
 
 `modes` should be a string representing the modes to +set or -unset, followed by any applicable args with appropriate spacing.
+
+## kick(channel, nick, [message, callback])
+
+Kicks a `nick` from a `channel`, with an optional `message`. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
+
+## ban(channel, user, [flags, message, callback])
+
+Bans a `user` from a `channel`. `user` must be an object with the same structure as a [`Sender Object`](#sender-object). That is, it should contain, at minimum, properties for the user's `nick`, `username`, and `hostname`.
+
+`flags` should be one or more flags from [`IRC.banFlags`](#ircbanflags). If not provided, it defaults to `IRC.banFlags.host | IRC.banFlags.kick`. The optional `message` will be used as a kick message if `IRC.banFlags.kick` is set.
+
+`callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection). If `IRC.banFlags.kick` is set, this will be called after the `KICK` command is sent. Otherwise, it'll be called after `MODE` is sent.
 
 Examples:
 
