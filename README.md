@@ -465,6 +465,12 @@ Sets or unsets `modes` on a `channel`. `callback` will be called, if provided, w
 
 `modes` should be a string representing the modes to +set or -unset, followed by any applicable args with appropriate spacing.
 
+Examples:
+
+- Set a channel's key to "foo" and unset it as moderated: `modes = "+k-m foo"`
+- Op a user named "foo": `modes = "+o foo"
+- Disable colors in a channel: `modes = "+c"`
+
 ## kick(channel, nick, [message, callback])
 
 Kicks a `nick` from a `channel`, with an optional `message`. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
@@ -476,12 +482,6 @@ Bans a `user` from a `channel`. `user` must be an object with the same structure
 `flags` should be one or more flags from [`IRC.banFlags`](#ircbanflags). If not provided, it defaults to `IRC.banFlags.host | IRC.banFlags.kick`. The optional `message` will be used as a kick message if `IRC.banFlags.kick` is set.
 
 `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection). If `IRC.banFlags.kick` is set, this will be called after the `KICK` command is sent. Otherwise, it'll be called after `MODE` is sent.
-
-Examples:
-
-- Set a channel's key to "foo" and unset it as moderated: `modes = "+k-m foo"`
-- Op a user named "foo": `modes = "+o foo"
-- Disable colors in a channel: `modes = "+c"`
 
 ## topic(channel, topic, [callback])
 
