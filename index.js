@@ -873,6 +873,18 @@ InternetRelayChat.prototype.mode = function(channel, modes, callback) {
 	this.sendLine({"command": "MODE", "args": args}, callback);
 };
 
+InternetRelayChat.prototype.kick = function(channel, nick, message, callback) {
+	if(typeof message === 'function') {
+		callback = message;
+	}
+	
+	if(typeof message !== 'string') {
+		message = undefined;
+	}
+	
+	this.sendLine({"command": "KICK", "args": [channel, nick], "tail": message}, callback);
+};
+
 InternetRelayChat.prototype.topic = function(channel, topic, callback) {
 	this.sendLine({"command": "TOPIC", "args": [channel], "tail": topic}, callback);
 };
