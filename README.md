@@ -421,6 +421,8 @@ Changes your nickname to `newNick`. `callback` will be called, if provided, when
 
 Sends a CTCP message to `nick`. `message` should be the CTCP message to be sent, followed by any arguments. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
 
+`nick` can be a string or an object containing a `nick` property (such as a [`Sender Object`](#sender-object)).
+
 An example of a `CTCP-PING` request:
 
 ```js
@@ -430,6 +432,8 @@ bot.ctcp('McKay', "PING");
 ## ctcpReply(nick, message, [callback])
 
 Sends a CTCP reply to `nick`. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
+
+`nick` can be a string or an object containing a `nick` property (such as a [`Sender Object`](#sender-object)).
 
 An example reply to a `CTCP-VERSION` request:
 
@@ -441,11 +445,11 @@ bot.on('ctcp-version', function(line) {
 
 ## message(recipient, message, [callback])
 
-Sends a message to a recipient. `recipient` should be either a nick (for a private message) or a channel (for a channel message) starting with the appropriate channel prefix. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
+Sends a message to a recipient. `recipient` should be either a nick or an object containing a `nick` property (for a private message), or a channel (for a channel message) starting with the appropriate channel prefix. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
 
 ## notice(recipient, message, [callback])
 
-Sends a notice to a recipient. `recipient` should be either a nick (for a private message) or a channel (for a channel notice) starting with the appropriate channel prefix. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
+Sends a notice to a recipient. `recipient` should be either a nick or an object containing a `nick` property (for a private message), or a channel (for a channel notice) starting with the appropriate channel prefix. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
 
 ## action(recipient, message, [callback])
 
@@ -475,6 +479,8 @@ Examples:
 
 Kicks a `nick` from a `channel`, with an optional `message`. `callback` will be called, if provided, when the command has been sent to the server (may be late due to flood protection).
 
+`nick` can be a string or an object containing a `nick` property (such as a [`Sender Object`](#sender-object)).
+
 ## ban(channel, user, [flags, message, callback])
 
 Bans a `user` from a `channel`. `user` must be an object with the same structure as a [`Sender Object`](#sender-object). That is, it should contain, at minimum, properties for the user's `nick`, `username`, and `hostname`.
@@ -495,9 +501,13 @@ Sends a request to the IRC server for the full list of nicks in `channel`. The `
 
 Sends a request to the IRC server for a user's information. The `whois` event will be emitted when the full response is received.
 
+`nick` can be a string or an object containing a `nick` property (such as a [`Sender Object`](#sender-object)).
+
 ## userHasMode(channel, nick, mode)
 
 Returns `true` if a `nick` has an access `mode` in a `channel`, or `false` if we're not in that channel, the nick in question is not in that channel, or it doesn't have the access mode.
+
+`nick` can be a string or an object containing a `nick` property (such as a [`Sender Object`](#sender-object)).
 
 For example, to check if a user named "foo" is an op in #channel, you'd pass `channel = "#channel"`, `nick = "foo"`, `mode = "o"`
 

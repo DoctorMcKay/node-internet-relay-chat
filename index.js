@@ -812,6 +812,10 @@ InternetRelayChat.prototype.userHasMode = function(channel, nick, mode) {
 		return false;
 	}
 	
+	if(typeof nick === 'object') {
+		nick = nick.nick;
+	}
+	
 	var user = chan.users[nick];
 	if(!user) {
 		return false;
@@ -835,14 +839,26 @@ InternetRelayChat.prototype.ctcpReply = function(nick, message, callback) {
 };
 
 InternetRelayChat.prototype.message = function(recipient, message, callback) {
+	if(typeof recipient === 'object') {
+		recipient = recipient.nick;
+	}
+	
 	this.sendLine({"command": "PRIVMSG", "args": [recipient], tail: message}, callback);
 };
 
 InternetRelayChat.prototype.notice = function(recipient, message, callback) {
+	if(typeof recipient === 'object') {
+		recipient = recipient.nick;
+	}
+	
 	this.sendLine({"command": "NOTICE", "args": [recipient], tail: message}, callback);
 };
 
 InternetRelayChat.prototype.action = function(recipient, message, callback) {
+	if(typeof recipient === 'object') {
+		recipient = recipient.nick;
+	}
+	
 	this.sendLine({"command": "PRIVMSG", "args": [recipient], tail: "\u0001ACTION " + message + "\u0001"}, callback);
 };
 
@@ -867,6 +883,10 @@ InternetRelayChat.prototype.updateChannelNames = function(channel) {
 };
 
 InternetRelayChat.prototype.whois = function(nick) {
+	if(typeof nick === 'object') {
+		nick = nick.nick;
+	}
+	
 	if(!this.whoisData[nick]) {
 		this.whoisData[nick] = {};
 	}
@@ -889,6 +909,10 @@ InternetRelayChat.prototype.kick = function(channel, nick, message, callback) {
 		message = undefined;
 	}
 	
+	if(typeof nick === 'object') {
+		nick = nick.nick;
+	}
+	
 	this.sendLine({"command": "KICK", "args": [channel, nick], "tail": message}, callback);
 };
 
@@ -904,6 +928,10 @@ InternetRelayChat.prototype.ban = function(channel, user, flags, message, callba
 	} else if(typeof message === 'function') {
 		callback = message;
 		message = undefined;
+	}
+	
+	if(typeof nick === 'object') {
+		nick = nick.nick;
 	}
 	
 	flags = flags || (InternetRelayChat.banFlags.host | InternetRelayChat.banFlags.kick);
