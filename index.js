@@ -684,18 +684,22 @@ function parseLine(rawLine) {
 }
 
 function parseHostmask(hostmask) {
-	var user = {"hostmask": hostmask};
-	if(hostmask.indexOf('!') == -1 || hostmask.indexOf('@') == -1) {
-		user.nick = hostmask;
-		user.username = hostmask;
-		user.hostname = hostmask;
-		return user;
+	var match = hostmask.match(/([^!]+)!([^@]+)@(.+)/);
+	if(!match) {
+		return {
+			"hostmask": hostmask,
+			"nick": hostmask,
+			"username": hostmask,
+			"hostname": hostmask
+		};
 	}
 	
-	user.nick = hostmask.substring(0, hostmask.indexOf('!'));
-	user.username = hostmask.substring(hostmask.indexOf('!') + 1, hostmask.indexOf('@'));
-	user.hostname = hostmask.substring(hostmask.indexOf('@') + 1);
-	return user;
+	return {
+		"hostmask": hostmask,
+		"nick": match[1],
+		"username": match[2],
+		"hostname": match[3]
+	};
 }
 
 InternetRelayChat.prototype._addToChannel = function(nick, channel) {
