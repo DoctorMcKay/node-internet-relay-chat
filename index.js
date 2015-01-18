@@ -504,6 +504,13 @@ InternetRelayChat.rawColors = {
 	lightGray: '15'
 };
 
+InternetRelayChat.banFlags = {
+	nick: (1 << 0),
+	user: (1 << 1),
+	host: (1 << 2),
+	kick: (1 << 3)
+};
+
 InternetRelayChat.prototype.connect = function() {
 	var self = this;
 	var sockOptions = {"host": this.options.server, "port": this.options.port, "localAddress": this.options.localAddress};
@@ -883,6 +890,30 @@ InternetRelayChat.prototype.kick = function(channel, nick, message, callback) {
 	}
 	
 	this.sendLine({"command": "KICK", "args": [channel, nick], "tail": message}, callback);
+};
+
+InternetRelayChat.prototype.ban = function(channel, user, flags, message, callback) {
+	if(typeof flags === 'function') {
+		message = undefined;
+		callback = flags;
+		flags = 0;
+	} else if(typeof flags === 'string') {
+		message = flags;
+		callback = undefined;
+		flags = 0;
+	} else if(typeof message === 'function') {
+		callback = message;
+		message = undefined;
+	}
+	
+	flags = flags || (InternetRelayChat.banFlags.host | InternetRelayChat.banFlags.kick);
+	
+	var hostmask = (flags & InternetRelayChat.banFlags.nick ? user.nick : '*') + '!' + (flags & InternetRelayChat.banFlags.user ? user.username : '*') + '@' + (flags & InternetRelayChat.banFlags.host ? user.hostname : '*');
+	this.mode(channel, '+b ' + hostmask, (flags & InternetRelayChat.banFlags.kick ? undefined : callback));
+	
+	if(flags & InternetRelayChat.banFlags.kick) {
+		this.kick(channel, user.nick, message, callback);
+	}
 };
 
 InternetRelayChat.prototype.topic = function(channel, topic, callback) {
