@@ -533,11 +533,20 @@ InternetRelayChat.prototype.connect = function() {
 	});
 };
 
-InternetRelayChat.prototype.quit = function(message) {
+InternetRelayChat.prototype.quit = function(message, callback) {
+	if(typeof message === 'function') {
+		callback = message;
+		message = undefined;
+	}
+	
 	this.registered = false;
 	this.options.autoReconnect = 0;
 	var self = this;
 	this.sendLine({"command": "QUIT", "tail": message}, function() {
+		if(callback) {
+			callback();
+		}
+		
 		self.socket.destroy();
 	});
 };
