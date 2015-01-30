@@ -401,9 +401,9 @@ Emitted when an action (/me) is received, either directly to us in PM or to a ch
 
 Connects to the IRC server using the options passed in the constructor.
 
-## quit([message])
+## quit([message, callback])
 
-Quits (disconnects from) the IRC server with an optional message.
+Quits (disconnects from) the IRC server with an optional message. The callback will be called, if provided, when the QUIT command is sent.
 
 ## sendLine(line, callback)
 
