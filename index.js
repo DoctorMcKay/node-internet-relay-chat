@@ -108,7 +108,7 @@ function InternetRelayChat(options) {
 		var quitter = parseHostmask(line.prefix);
 		var channels = [];
 		for(var channel in self.channels) {
-			if(self.channels[channel].nicks.indexOf(quitter.nick) != -1) {
+			if(self.channels[channel].nicks.indexOf(quitter.nick) != -1 || self.channels[channel].users[quitter.nick]) {
 				channels.push(channel);
 				self._removeFromChannel(quitter.nick, channel);
 			}
