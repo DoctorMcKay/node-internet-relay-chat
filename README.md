@@ -541,7 +541,7 @@ This would parse into:
 
 # Sender Object
 
-Many mehods and events take or provide sender objects when referring to users. Sender objects are created by parsing hostmasks.
+Many methods and events take or provide sender objects when referring to users. Sender objects are created by parsing hostmasks.
 
 Here is an example hostmask: `Nick!username@hostname.myisp.net`
 
